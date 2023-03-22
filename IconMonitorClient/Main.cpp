@@ -91,8 +91,17 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
         delete pipeInst;
 }
 
-int main() {
-    printf("Waiting for client to connect...\n");
+int main(int argc, char* argv[]) {
+    printf("IconMonitorClient.\n");
+
+    if (argc < 2) {
+        std::cerr << "ERROR: Please provide a thread handle as argument.\n";
+        exit(-1);
+    }
+
+    DWORD thread_id = std::stoi(argv[1]);
+    std::cerr << "Injecting hook DLL into proces with thread-id=" << thread_id << std::endl;
+    MonitorIconUpdate monitor(thread_id);
 
     // event for the connect operation
     OVERLAPPED oConnect = {};

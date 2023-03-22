@@ -16,3 +16,25 @@ struct IconUpdateMessage {
         return result;
     }
 };
+
+class MonitorIconUpdate {
+public:
+    MonitorIconUpdate(DWORD thread_id) {
+        m_module = LoadLibraryW(L"IconMonitorHook.dll"); // DLL handle
+        auto callback = (HOOKPROC)GetProcAddress(m_module, "Hookproc");
+
+        m_hook = SetWindowsHookExW(WH_CALLWNDPROCRET, callback, m_module, thread_id);
+        assert(m_hook);
+    }
+    ~MonitorIconUpdate() {
+        UnhookWindowsHookEx(m_hook);
+        m_hook = 0;
+
+        FreeLibrary(m_module);
+        m_module = 0;
+    }
+
+private:
+    HINSTANCE m_module = 0;
+    HHOOK     m_hook = 0;
+};
