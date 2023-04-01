@@ -1,3 +1,4 @@
+#include <iostream>
 #include <windows.h>
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -50,16 +51,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
     case WM_PAINT:
         {
-            PAINTSTRUCT ps;
+            PAINTSTRUCT ps = {};
             HDC hdc = BeginPaint(hwnd, &ps);
-
-            // All painting occurs here, between BeginPaint and EndPaint.
-
+            // All painting occurs here, between BeginPaint and EndPaint
             FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
-
             EndPaint(hwnd, &ps);
         }
         return 0;
+    case WM_LBUTTONDOWN:
+        // TODO: Update icon
+        std::wcout << L"Mouse click.\n";
+        break;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
