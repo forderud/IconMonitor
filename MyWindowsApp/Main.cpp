@@ -16,6 +16,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     DWORD thread_id = GetCurrentThreadId();
     std::wstring window_title = L"My Windows app (thread " + std::to_wstring(thread_id) + L")";
+    {
+        // copy thread ID to clipboard
+        std::string str = std::to_string(thread_id); // in decimal format
+        // copy string to separate buffer
+        const size_t len = str.size() + 1;
+        HGLOBAL buf = GlobalAlloc(GMEM_MOVEABLE, len);
+        memcpy(GlobalLock(buf), str.c_str(), len);
+        GlobalUnlock(buf);
+        // move buffer to clipboard
+        OpenClipboard(0);
+        EmptyClipboard();
+        SetClipboardData(CF_TEXT, buf); // transfer ownership to clipboard
+        buf = nullptr;
+        CloseClipboard();
+    }
 
     // Create the window.
     HWND hwnd = CreateWindowEx(0, CLASS_NAME,
