@@ -59,8 +59,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
         return 0;
     case WM_LBUTTONDOWN:
-        // TODO: Update icon
-        std::wcout << L"Mouse click.\n";
+        {
+            // update app icon
+            HICON icon_titlebar = LoadIconW(NULL, IDI_EXCLAMATION);
+            HICON icon_taskbar = LoadIconW(NULL, IDI_ERROR);
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon_titlebar); // update window titlebar (top-left icon)
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon_taskbar);    // update windws taskbar at bottom om screen
+        }
         break;
     }
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
