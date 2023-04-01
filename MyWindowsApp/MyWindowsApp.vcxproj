@@ -14,7 +14,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{eda38863-f423-435f-a364-750fe08a10de}</ProjectGuid>
-    <RootNamespace>WindowsApp</RootNamespace>
+    <RootNamespace>MyWindowsApp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
