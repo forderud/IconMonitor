@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IconMonitorClient", "IconMo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IconMonitorHook", "IconMonitorHook\IconMonitorHook.vcxproj", "{B300904F-703B-42A4-AB83-7312646CC095}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WindowsApp", "WindowsApp\WindowsApp.vcxproj", "{EDA38863-F423-435F-A364-750FE08A10DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{B300904F-703B-42A4-AB83-7312646CC095}.Debug|x64.Build.0 = Debug|x64
 		{B300904F-703B-42A4-AB83-7312646CC095}.Release|x64.ActiveCfg = Release|x64
 		{B300904F-703B-42A4-AB83-7312646CC095}.Release|x64.Build.0 = Release|x64
+		{EDA38863-F423-435F-A364-750FE08A10DE}.Debug|x64.ActiveCfg = Debug|x64
+		{EDA38863-F423-435F-A364-750FE08A10DE}.Debug|x64.Build.0 = Debug|x64
+		{EDA38863-F423-435F-A364-750FE08A10DE}.Release|x64.ActiveCfg = Release|x64
+		{EDA38863-F423-435F-A364-750FE08A10DE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
