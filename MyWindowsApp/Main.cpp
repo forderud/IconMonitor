@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <windows.h>
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -13,11 +14,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     wc.lpszClassName = CLASS_NAME;
     RegisterClass(&wc);
 
+    DWORD thread_id = GetCurrentThreadId();
+    std::wstring window_title = L"My Windows app (thread " + std::to_wstring(thread_id) + L")";
+
     // Create the window.
-    HWND hwnd = CreateWindowEx(
-        0,                      // Optional window styles.
-        CLASS_NAME,             // Window class
-        L"My Windows app",      // Window text
+    HWND hwnd = CreateWindowEx(0, CLASS_NAME,
+        window_title.c_str(),
         WS_OVERLAPPEDWINDOW,    // Window style
         // Size and position
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
