@@ -4,7 +4,6 @@
 #include "..\IconMonitorClient\Message.hpp"
 
 
-
 static HANDLE g_pipe = 0;
 
 
