@@ -55,9 +55,10 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
         CallNextHookEx(NULL, code, sent_by_current_proc, param);
 
     auto* cwp = (CWPRETSTRUCT*)param;
+    bool message_succeeded = (cwp->lResult == 0);
 
     // filter successful actions for the specified window
-    if ((code == HC_ACTION) && (cwp->lResult == 0)) {
+    if ((code == HC_ACTION) && message_succeeded) {
         // filter set-icon messages
         if (cwp->message == WM_SETICON) {
             OnIconUpdated(cwp->hwnd, cwp->wParam, (HICON)cwp->lParam);
