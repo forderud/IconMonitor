@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
             pending_io = false;
 
             // Create new pipe instance for the next client. 
-            std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
+            //std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
             break;
         }
 
