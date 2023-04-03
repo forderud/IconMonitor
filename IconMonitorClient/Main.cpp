@@ -20,6 +20,8 @@ struct PIPEINST : public OVERLAPPED {
         }
 
         CloseHandle(pipe);
+
+        printf("Pipe disconnected.\n");
     }
 
     HANDLE pipe = 0;
