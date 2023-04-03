@@ -56,13 +56,13 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap) {
     switch (GetLastError()) {
     case ERROR_IO_PENDING:
         // overlapped connection in progress
-        return { TRUE, pipe };
+        return { true, pipe };
 
     case ERROR_PIPE_CONNECTED:
         // Client already connected, so signal an event.
         // This is unlikely, but can happen if the client connects between CreateNamedPipe and ConnectNamedPipe.
         if (SetEvent(overlap.hEvent))
-            return { FALSE, pipe };
+            return { false, pipe };
 
     default:
         // error occured during the connect operation... 
@@ -107,17 +107,17 @@ int main(int argc, char* argv[]) {
 
     // event for the connect operation
     OVERLAPPED oConnect = {};
-    oConnect.hEvent = CreateEventW(NULL, TRUE, TRUE, NULL);
+    oConnect.hEvent = CreateEventW(NULL, true, true, NULL);
     assert(oConnect.hEvent);
 
-    BOOL  fPendingIO = FALSE;
+    BOOL  fPendingIO = false;
     HANDLE pipe = 0;
     std::tie(fPendingIO, pipe) = CreateAndConnectInstance(oConnect);
 
     for(;;) {
         // Wait for a client to connect, or for a read or write operation to be completed,
         // which causes a completion routine to be queued for execution. 
-        DWORD res = WaitForSingleObjectEx(oConnect.hEvent, INFINITE, TRUE); // alertable wait
+        DWORD res = WaitForSingleObjectEx(oConnect.hEvent, INFINITE, true); // alertable wait
 
         switch (res) {
         case WAIT_OBJECT_0:
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
             // If an operation is pending, get the result of the connect operation. 
             if (fPendingIO) {
                 DWORD cbRet = 0;
-                BOOL ok = GetOverlappedResult(pipe, &oConnect, &cbRet, FALSE); // non-blocking
+                BOOL ok = GetOverlappedResult(pipe, &oConnect, &cbRet, false); // non-blocking
                 if (!ok) {
                     printf("ConnectNamedPipe (%d)\n", GetLastError());
                     return 0;
