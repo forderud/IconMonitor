@@ -20,7 +20,7 @@ public:
             res = SendMessageW(wnd, WM_SETICON, ICON_BIG, (LPARAM)m_icon);   // update windws taskbar at bottom om screen
         else
             res = SendMessageW(wnd, WM_SETICON, ICON_SMALL, (LPARAM)m_icon); // update window titlebar (top-left icon)
-        // TODO: Figure out why second call fail with res=65585 (0x10031) despite all icons being updated
+        // res contains prev icon handle
     }
 private:
     HICON m_icon = 0;

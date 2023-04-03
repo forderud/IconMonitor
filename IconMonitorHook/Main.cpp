@@ -55,16 +55,12 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
         CallNextHookEx(NULL, code, sent_by_current_proc, param);
 
     auto* cwp = (CWPRETSTRUCT*)param;
-    bool message_succeeded = (cwp->lResult == 0);
-    if (!message_succeeded) {
-        if (cwp->lResult == 65585)
-            message_succeeded = true; // HACK: pretent that SendMessageW(.., WM_SETICON,...) succeeded
-    }
 
     // filter successful actions for the specified window
-    if ((code == HC_ACTION) && message_succeeded) {
+    if (code == HC_ACTION) {
         // filter set-icon messages
         if (cwp->message == WM_SETICON) {
+            // cwp->lResult contains the prev. icon handle
             OnIconUpdated(cwp->hwnd, cwp->wParam, (HICON)cwp->lParam);
         }
     }
