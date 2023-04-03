@@ -1,14 +1,20 @@
+#include <cassert>
 #include <iostream>
 #include <string>
-#include <windows.h>
+#include "IconHandle.hpp"
+
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+static IconHandle m_titlebar(LoadIconW(NULL, IDI_EXCLAMATION));
+static IconHandle m_taskbar(LoadIconW(NULL, IDI_ERROR));
+
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     // Register the window class.
     const wchar_t CLASS_NAME[] = L"My Window Class";
 
-    WNDCLASS wc = { };
+    WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = CLASS_NAME;
@@ -43,14 +49,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         hInstance,  // Instance handle
         NULL        // Additional application data
     );
-
-    if (hwnd == NULL)
-        return 0;
+    assert(hwnd);
 
     ShowWindow(hwnd, nCmdShow);
 
     // Run the message loop.
-
     MSG msg = { };
     while (GetMessage(&msg, NULL, 0, 0) > 0) {
         TranslateMessage(&msg);
@@ -77,11 +80,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         return 0;
     case WM_LBUTTONDOWN:
         {
-            // update app icon
-            HICON icon_titlebar = LoadIconW(NULL, IDI_EXCLAMATION);
-            HICON icon_taskbar = LoadIconW(NULL, IDI_ERROR);
-            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)icon_titlebar); // update window titlebar (top-left icon)
-            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)icon_taskbar);    // update windws taskbar at bottom om screen
+            // swap & update icons
+            m_titlebar.Swap(m_taskbar);
+            m_titlebar.Activate(hwnd, true);
+            m_taskbar.Activate(hwnd, false);
         }
         break;
     }
