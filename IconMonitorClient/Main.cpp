@@ -125,8 +125,8 @@ int main(int argc, char* argv[]) {
         {
             // If an operation is pending, get the result of the connect operation. 
             if (pending_io) {
-                DWORD cbRet = 0;
-                BOOL ok = GetOverlappedResult(pipe, &oConnect, &cbRet, false); // non-blocking
+                DWORD bytes_xfered = 0;
+                BOOL ok = GetOverlappedResult(pipe, &oConnect, &bytes_xfered, false); // non-blocking
                 if (!ok) {
                     printf("ConnectNamedPipe (%d)\n", GetLastError());
                     return 0;
