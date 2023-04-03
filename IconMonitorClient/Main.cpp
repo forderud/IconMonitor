@@ -110,9 +110,9 @@ int main(int argc, char* argv[]) {
     oConnect.hEvent = CreateEventW(NULL, true, true, NULL);
     assert(oConnect.hEvent);
 
-    BOOL  fPendingIO = false;
+    BOOL  pending_io = false;
     HANDLE pipe = 0;
-    std::tie(fPendingIO, pipe) = CreateAndConnectInstance(oConnect);
+    std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
 
     for(;;) {
         // Wait for a client to connect, or for a read or write operation to be completed,
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
             // The wait conditions are satisfied by a completed connect operation. 
         {
             // If an operation is pending, get the result of the connect operation. 
-            if (fPendingIO) {
+            if (pending_io) {
                 DWORD cbRet = 0;
                 BOOL ok = GetOverlappedResult(pipe, &oConnect, &cbRet, false); // non-blocking
                 if (!ok) {
@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) {
             // Start the read operation for this client (move pipe to new PIPEINST object)
             CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
             pipe = 0;
-            fPendingIO = false;
+            pending_io = false;
 
             // Create new pipe instance for the next client. 
-            std::tie(fPendingIO, pipe) = CreateAndConnectInstance(oConnect);
+            std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
             break;
         }
 
