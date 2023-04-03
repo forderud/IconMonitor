@@ -16,8 +16,9 @@ static HANDLE InitializePipe() {
         0,              // default attributes 
         NULL);          // no template file 
     if (pipe == INVALID_HANDLE_VALUE) {
+        // will fail when loaded in host process
         printf("ERROR: Unable to connect to pipe. GLE=%d\n", GetLastError());
-        exit(-1);
+        return 0;
     }
 
     // change pipe from byte- to message-mode
@@ -50,7 +51,8 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
     if (code < 0) // do not process message 
         return CallNextHookEx(NULL, code, sent_by_current_proc, param);
 
-    assert(!sent_by_current_proc);
+    if (!sent_by_current_proc)
+        CallNextHookEx(NULL, code, sent_by_current_proc, param);
 
     auto* cwp = (CWPRETSTRUCT*)param;
 
