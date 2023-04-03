@@ -56,6 +56,10 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
 
     auto* cwp = (CWPRETSTRUCT*)param;
     bool message_succeeded = (cwp->lResult == 0);
+    if (!message_succeeded) {
+        if (cwp->lResult == 65585)
+            message_succeeded = true; // HACK: pretent that SendMessageW(.., WM_SETICON,...) succeeded
+    }
 
     // filter successful actions for the specified window
     if ((code == HC_ACTION) && message_succeeded) {
