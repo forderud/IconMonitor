@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
             // Start the read operation for this client (move pipe to new PIPEINST object)
             CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
             pipe = 0;
+            fPendingIO = false;
 
             // Create new pipe instance for the next client. 
             std::tie(fPendingIO, pipe) = CreateAndConnectInstance(oConnect);
