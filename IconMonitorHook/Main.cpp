@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <Windows.h>
-#include "..\IconMonitorClient\Message.hpp"
+#include "Message.hpp"
 
 
 static HANDLE g_pipe = 0;

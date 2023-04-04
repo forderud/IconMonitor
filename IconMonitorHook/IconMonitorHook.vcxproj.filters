@@ -3,4 +3,7 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Message.hpp" />
+  </ItemGroup>
 </Project>

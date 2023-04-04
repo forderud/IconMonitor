@@ -2,7 +2,7 @@
 #include <iostream>
 #include <tuple>
 #include <Windows.h>
-#include "Message.hpp"
+#include "../IconMonitorHook/Message.hpp"
 
 
 struct PIPEINST : public OVERLAPPED {
