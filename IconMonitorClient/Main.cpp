@@ -84,7 +84,8 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     }
 
     // print result of previous read
-    printf(pipeInst->request.ToString().c_str());
+    if (pipeInst->request.IsValid())
+        printf(pipeInst->request.ToString().c_str());
 
     // schedule next read
     BOOL ok = ReadFileEx(pipeInst->pipe, &pipeInst->request, sizeof(pipeInst->request),

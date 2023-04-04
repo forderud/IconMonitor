@@ -9,6 +9,10 @@ struct IconUpdateMessage {
     WPARAM param = 0;
     HICON  icon = 0;
 
+    bool IsValid() const {
+        return window || param || icon;
+    }
+
     std::string ToString() const {
         std::string result = "[IconUpdateMessage] window=" + std::to_string((size_t)window)
             + ", param=" + std::to_string(param)
