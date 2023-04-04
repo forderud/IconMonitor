@@ -39,11 +39,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
 
     // Create the window.
+    POINT position = {CW_USEDEFAULT, CW_USEDEFAULT};
+    POINT size = {600, 400};
+
     HWND hwnd = CreateWindowEx(0, CLASS_NAME,
         window_title.c_str(),
         WS_OVERLAPPEDWINDOW,    // Window style
-        // Size and position
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        position.x, position.y, size.x, size.y,
         NULL,       // Parent window    
         NULL,       // Menu
         hInstance,  // Instance handle
