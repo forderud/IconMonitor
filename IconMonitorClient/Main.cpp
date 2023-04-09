@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
     HANDLE pipe = 0;
     std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
 
-    for(;;) {
+    while(pipe) {
         // Wait for a client to connect, or for a read or write operation to be completed,
         // which causes a completion routine to be queued for execution. 
         DWORD res = WaitForSingleObjectEx(oConnect.hEvent, INFINITE, true); // alertable wait
