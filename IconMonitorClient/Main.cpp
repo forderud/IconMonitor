@@ -6,8 +6,10 @@
 
 
 struct PIPEINST : public OVERLAPPED {
-    PIPEINST(HANDLE _pipe) : pipe(_pipe) {
+    PIPEINST(HANDLE _pipe, HANDLE _completed) : pipe(_pipe), completed(_completed) {
         assert(_pipe);
+        s_obj_count++;
+
         // clear inherited fields
         Internal = 0;
         InternalHigh = 0;
@@ -23,12 +25,19 @@ struct PIPEINST : public OVERLAPPED {
         CloseHandle(pipe);
 
         printf("Pipe disconnected.\n");
+
+        auto new_cnt = --s_obj_count;
+        if (!new_cnt)
+            SetEvent(completed);
     }
 
     HANDLE pipe = 0;
+    HANDLE completed = 0; ///< event to signal IO completion
 
     // read message
     IconUpdateMessage request;
+private:
+    std::atomic<int> s_obj_count = 0;
 };
 
 
@@ -114,6 +123,9 @@ int main(int argc, char* argv[]) {
     oConnect.hEvent = CreateEventW(NULL, true, true, NULL);
     assert(oConnect.hEvent);
 
+    HANDLE completed = CreateEventW(NULL, true, false, NULL);
+    assert(completed);
+
     BOOL  pending_io = false;
     HANDLE pipe = 0;
     std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
@@ -138,7 +150,7 @@ int main(int argc, char* argv[]) {
             }
 
             // Start the read operation for this client (move pipe to new PIPEINST object)
-            CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
+            CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe, completed));
             pipe = 0;
             pending_io = false;
 
@@ -158,6 +170,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // never reached
+    // wait for IO completion
+    WaitForSingleObject(completed, INFINITE);
+
     return 0;
 }
