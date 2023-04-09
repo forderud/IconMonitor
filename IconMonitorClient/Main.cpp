@@ -31,8 +31,10 @@ struct PIPEINST : public OVERLAPPED {
 };
 
 
-std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap) {
-    HANDLE pipe = CreateNamedPipeW(PIPE_NAME,
+std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id) {
+    std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
+
+    HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
         PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // read/write access | overlapped mode
         PIPE_TYPE_MESSAGE |       // message-type pipe 
         PIPE_READMODE_MESSAGE |   // message read mode 
@@ -113,7 +115,7 @@ int main(int argc, char* argv[]) {
 
     BOOL  pending_io = false;
     HANDLE pipe = 0;
-    std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
+    std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
 
     for(;;) {
         // Wait for a client to connect, or for a read or write operation to be completed,
@@ -140,7 +142,7 @@ int main(int argc, char* argv[]) {
             pending_io = false;
 
             // Create new pipe instance for the next client. 
-            std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect);
+            std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
             break;
         }
 

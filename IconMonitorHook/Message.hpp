@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-static constexpr wchar_t PIPE_NAME[] = L"\\\\.\\pipe\\IconMonitor";
+static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 static constexpr DWORD PIPE_TIMEOUT = 5000;
 
 struct IconUpdateMessage {
