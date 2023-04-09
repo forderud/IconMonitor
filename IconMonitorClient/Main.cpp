@@ -7,6 +7,7 @@
 
 struct PIPEINST : public OVERLAPPED {
     PIPEINST(HANDLE _pipe) : pipe(_pipe) {
+        assert(_pipe);
         // clear inherited fields
         Internal = 0;
         InternalHigh = 0;
