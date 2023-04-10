@@ -16,10 +16,8 @@ struct PIPEINST : public OVERLAPPED {
     }
 
     ~PIPEINST() {
-        if (!DisconnectNamedPipe(pipe)) {
-            printf("DisconnectNamedPipe failed with %d.\n", GetLastError());
-        }
-
+        BOOL ok = DisconnectNamedPipe(pipe);
+        assert(ok);
         CloseHandle(pipe);
 
         printf("Pipe disconnected.\n");
