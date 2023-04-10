@@ -16,8 +16,33 @@ struct IconUpdateMessage {
     std::string ToString() const {
         std::string result = "[IconUpdateMessage] window=" + std::to_string((size_t)window)
             + ", param=" + std::to_string(param)
-            + ", icon=" + std::to_string((size_t)icon) + "\n";
+            + ", icon=" + std::to_string((size_t)icon);
+
+        auto size = IconSize(icon);
+        result += " size={" + std::to_string(size.cx) + "," + std::to_string(size.cy) + "}\n";
         return result;
+    }
+
+private:
+    SIZE IconSize(HICON icon) const {
+        ICONINFO ii = {};
+        BOOL ok = GetIconInfo(icon, &ii);
+        assert(ok);
+
+        BITMAP bm = {};
+        ok = GetObject(ii.hbmMask, sizeof(bm), &bm) == sizeof(bm);
+        assert(ok);
+
+        if (ii.hbmMask)
+            DeleteObject(ii.hbmMask);
+        if (ii.hbmColor)
+            DeleteObject(ii.hbmColor);
+
+        SIZE size = {
+            bm.bmWidth,
+            ii.hbmColor ? bm.bmHeight : bm.bmHeight / 2,
+        };
+        return size;
     }
 };
 
