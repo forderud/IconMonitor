@@ -102,6 +102,10 @@ int main(int argc, char* argv[]) {
     DWORD thread_id = std::stoi(argv[1]);
     std::cerr << "Injecting hook DLL into proces with thread-id=" << thread_id << std::endl;
     MonitorIconUpdate monitor(thread_id);
+    if (!monitor) {
+        std::cerr << "ERROR: Invalid thread handle argument.\n";
+        exit(-1);
+    }
 
     // event for the connect operation
     OVERLAPPED oConnect = {};
