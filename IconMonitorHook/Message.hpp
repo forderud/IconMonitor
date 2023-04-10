@@ -4,7 +4,8 @@
 static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 static constexpr DWORD PIPE_TIMEOUT = 5000;
 
-struct IconUpdateMessage {
+class IconUpdateMessage {
+public:
     HWND   window = 0;
     WPARAM param = 0;
     HICON  icon = 0;
