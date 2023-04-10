@@ -9,5 +9,3 @@ Sample project of DLL injection using [Windows hooks](https://learn.microsoft.co
 * Click inside the `MyWindowsApp` window body.
 * Observe that the titlebar and Windows taskbar icons are updated.
 * Observe that `IconMonitorClient` reports icon update events.
-
-WARNING: Work in progress project that only partially works.
