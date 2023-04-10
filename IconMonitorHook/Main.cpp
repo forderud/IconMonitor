@@ -20,7 +20,6 @@ static HANDLE InitializePipe() {
         NULL);          // no template file 
     if (pipe == INVALID_HANDLE_VALUE) {
         // will fail when loaded in host process
-        printf("ERROR: Unable to connect to pipe. GLE=%d\n", GetLastError());
         return 0;
     }
 
