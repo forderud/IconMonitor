@@ -22,26 +22,21 @@ static HICON CreateIconFromRGB(HWND wnd) {
     iconInfo.fIcon = TRUE;
 
     iconInfo.hbmColor = CreateBitmap(width, height, 1, 32, bitmap.data());
-    if (!iconInfo.hbmColor) {
-        printf("Failed to create bitmap mask.");
-        abort();
-    }
+    assert(iconInfo.hbmColor);
 
     // Obtain a handle to the screen device context.
     HDC hdcScreen = GetDC(wnd);
+    assert(hdcScreen);
 
     iconInfo.hbmMask = CreateCompatibleBitmap(hdcScreen, width, height);
-    if (!iconInfo.hbmMask) {
-        printf("Failed to create color mask.");
-        abort();
-    }
+    assert(iconInfo.hbmMask);
 
     HICON hIcon = CreateIconIndirect(&iconInfo);
     assert(hIcon);
 
     DeleteObject(iconInfo.hbmMask);
-    DeleteObject(iconInfo.hbmColor);
     ReleaseDC(NULL, hdcScreen);
+    DeleteObject(iconInfo.hbmColor);
 
     return hIcon;
 }
