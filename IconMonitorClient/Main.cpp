@@ -108,18 +108,18 @@ int main(int argc, char* argv[]) {
     }
 
     // event for the connect operation
-    OVERLAPPED oConnect = {};
-    oConnect.hEvent = CreateEventW(NULL, true, true, NULL);
-    assert(oConnect.hEvent);
+    OVERLAPPED connect = {};
+    connect.hEvent = CreateEventW(NULL, true, true, NULL);
+    assert(connect.hEvent);
 
     BOOL  pending_io = false;
     HANDLE pipe = 0;
-    std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
+    std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
     while(pipe) {
         // Wait for a client to connect, or for a read or write operation to be completed,
         // which causes a completion routine to be queued for execution. 
-        DWORD res = WaitForSingleObjectEx(oConnect.hEvent, INFINITE, true); // alertable wait
+        DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
         switch (res) {
         case WAIT_OBJECT_0:
@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
             // If an operation is pending, get the result of the connect operation. 
             if (pending_io) {
                 DWORD bytes_xfered = 0;
-                BOOL ok = GetOverlappedResult(pipe, &oConnect, &bytes_xfered, false); // non-blocking
+                BOOL ok = GetOverlappedResult(pipe, &connect, &bytes_xfered, false); // non-blocking
                 if (!ok) {
                     printf("ConnectNamedPipe (%d)\n", GetLastError());
                     return 0;
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
             pending_io = false;
 
             // Create new pipe instance for the next client. 
-            std::tie(pending_io, pipe) = CreateAndConnectInstance(oConnect, thread_id);
+            std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
             break;
         }
 
