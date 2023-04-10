@@ -14,6 +14,12 @@ public:
             DestroyIcon(m_icon);
     }
 
+    IconHandle& operator = (IconHandle&& other) {
+        Swap(other);
+        return *this;
+    }
+
+
     void Swap(IconHandle & other) {
         std::swap(m_icon, other.m_icon);
         std::swap(m_destroy, other.m_destroy);
