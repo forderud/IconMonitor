@@ -6,8 +6,8 @@
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static IconHandle m_titlebar(LoadIconW(NULL, IDI_EXCLAMATION));
-static IconHandle m_taskbar(LoadIconW(NULL, IDI_ERROR));
+static IconHandle m_titlebar(LoadIconW(NULL, IDI_EXCLAMATION), false);
+static IconHandle m_taskbar(LoadIconW(NULL, IDI_ERROR), false);
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
@@ -84,8 +84,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         {
             // swap & update icons
             m_titlebar.Swap(m_taskbar);
-            m_titlebar.Activate(hwnd, true);
-            m_taskbar.Activate(hwnd, false);
+            m_titlebar.Activate(hwnd, ICON_BIG);
+            m_taskbar.Activate(hwnd, ICON_SMALL);
         }
         break;
     }
