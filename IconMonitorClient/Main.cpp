@@ -65,7 +65,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         // error occured during the connect operation... 
         printf("ConnectNamedPipe failed with %d.\n", GetLastError());
         assert(false);
-        exit(-1);
+        abort();
     }
 }
 
