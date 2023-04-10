@@ -43,11 +43,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         sizeof(IconUpdateMessage),// input buffer size 
         PIPE_TIMEOUT,             // client time-out 
         NULL);                    // security
-    if (pipe == INVALID_HANDLE_VALUE) {
-        printf("CreateNamedPipe failed with %d.\n", GetLastError());
-        assert(false);
-        exit(-1);
-    }
+    assert(pipe != INVALID_HANDLE_VALUE);
 
     // connect to the new client. 
     // wait for client to connect
