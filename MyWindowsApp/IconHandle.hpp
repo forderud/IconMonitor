@@ -4,6 +4,8 @@
 
 class IconHandle {
 public:
+    IconHandle() = default;
+
     IconHandle(HICON icon, bool destroy) : m_icon(icon), m_destroy(destroy) {
     }
 

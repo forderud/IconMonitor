@@ -6,13 +6,16 @@
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static IconHandle m_titlebar(LoadIconW(NULL, IDI_EXCLAMATION), false);
-static IconHandle m_taskbar(LoadIconW(NULL, IDI_ERROR), false);
+static IconHandle m_titlebar;
+static IconHandle m_taskbar;
 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
     // Register the window class.
     const wchar_t CLASS_NAME[] = L"My Window Class";
+
+    m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), false);
+    m_taskbar = IconHandle(LoadIconW(NULL, IDI_ERROR), false);
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
