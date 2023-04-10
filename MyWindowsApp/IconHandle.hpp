@@ -1,6 +1,51 @@
 #pragma once
 #include <cassert>
+#include <vector>
 #include <Windows.h>
+
+
+static HICON CreateIconFromRGB(HWND wnd) {
+    const uint8_t width = 32, height = 32;
+    std::vector<uint32_t> bitmap(width * height);
+
+    for (uint8_t y = 0; y < height; y++) {
+        for (uint8_t x = 0; x < width; x++) {
+            uint8_t A = 255;
+            uint8_t R = 8*x;
+            uint8_t G = 8*y;
+            uint8_t B = 0;
+            bitmap[y*width + x] = (A << 24) | (R << 16) | (G << 8) | B;
+        }
+    }
+
+    ICONINFO iconInfo = {};
+    iconInfo.fIcon = TRUE;
+
+    iconInfo.hbmColor = CreateBitmap(width, height, 1, 32, bitmap.data());
+    if (!iconInfo.hbmColor) {
+        printf("Failed to create bitmap mask.");
+        abort();
+    }
+
+    // Obtain a handle to the screen device context.
+    HDC hdcScreen = GetDC(wnd);
+
+    iconInfo.hbmMask = CreateCompatibleBitmap(hdcScreen, width, height);
+    if (!iconInfo.hbmMask) {
+        printf("Failed to create color mask.");
+        abort();
+    }
+
+    HICON hIcon = CreateIconIndirect(&iconInfo);
+    assert(hIcon);
+
+    DeleteObject(iconInfo.hbmMask);
+    DeleteObject(iconInfo.hbmColor);
+    ReleaseDC(NULL, hdcScreen);
+
+    return hIcon;
+}
+
 
 class IconHandle {
 public:

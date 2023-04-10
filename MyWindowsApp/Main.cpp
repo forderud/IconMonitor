@@ -15,7 +15,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     const wchar_t CLASS_NAME[] = L"My Window Class";
 
     m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), false);
-    m_taskbar = IconHandle(LoadIconW(NULL, IDI_ERROR), false);
+    m_taskbar = IconHandle(CreateIconFromRGB(NULL), true);
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
