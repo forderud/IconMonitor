@@ -72,7 +72,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 // This routine is called as a completion routine after writing to 
 // the pipe, or when a new client has connected to a pipe instance.
 void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
-    auto* pipeInst = (PIPEINST*)overLap;
+    auto* pipeInst = static_cast<PIPEINST*>(overLap);
 
     if ((err != 0) || (bRead != sizeof(pipeInst->request))) {
         // previous read failed so clean up and return
