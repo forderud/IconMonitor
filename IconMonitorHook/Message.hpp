@@ -30,13 +30,13 @@ private:
         BOOL ok = GetIconInfo(icon, &ii);
         assert(ok);
 
-        BITMAP mask = {};
-        ok = GetObject(ii.hbmMask, sizeof(mask), &mask) == sizeof(mask);
+        BITMAP color = {};
+        ok = GetObject(ii.hbmColor, sizeof(color), &color) == sizeof(color);
         assert(ok);
 
         POINT size = {
-            mask.bmWidth,
-            ii.hbmColor ? mask.bmHeight : mask.bmHeight / 2,
+            color.bmWidth,
+            ii.hbmColor ? color.bmHeight : color.bmHeight / 2,
         };
 
         if (ii.hbmMask) {
