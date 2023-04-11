@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 static constexpr DWORD PIPE_TIMEOUT = 5000;
@@ -33,6 +34,29 @@ private:
         BITMAP color = {};
         ok = GetObject(ii.hbmColor, sizeof(color), &color) == sizeof(color);
         assert(ok);
+
+        {
+            // TEST: Retrieve icon pixels
+            HDC dc = CreateCompatibleDC(NULL);
+
+            // call GetDIBits to fill "bmp_info" struct
+            BITMAPINFO bmp_info = {};
+            bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
+            int ok = GetDIBits(dc, ii.hbmColor, 0, color.bmHeight, nullptr, &bmp_info, DIB_RGB_COLORS);
+            if (!ok)
+                abort();
+
+            bmp_info.bmiHeader.biCompression = BI_RGB; // disable compression
+
+            // call GetDIBits to get image data
+            const RGBQUAD ZERO_PIZEL = {};
+            std::vector<RGBQUAD> pixels(color.bmHeight*color.bmWidth, ZERO_PIZEL);
+            int scan_lines = GetDIBits(dc, ii.hbmColor, 0, color.bmHeight, pixels.data(), &bmp_info, DIB_RGB_COLORS);
+            if (scan_lines != color.bmHeight)
+                abort();
+
+            DeleteDC(dc);
+        }
 
         POINT size = {
             color.bmWidth,
