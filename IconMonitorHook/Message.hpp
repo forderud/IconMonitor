@@ -20,29 +20,34 @@ public:
             + ", icon=" + std::to_string((size_t)icon);
 
         auto size = IconSize(icon);
-        result += " size={" + std::to_string(size.cx) + "," + std::to_string(size.cy) + "}\n";
+        result += " size={" + std::to_string(size.x) + "," + std::to_string(size.y) + "}\n";
         return result;
     }
 
 private:
-    SIZE IconSize(HICON icon) const {
+    POINT IconSize(HICON icon) const {
         ICONINFO ii = {};
         BOOL ok = GetIconInfo(icon, &ii);
         assert(ok);
 
-        BITMAP bm = {};
-        ok = GetObject(ii.hbmMask, sizeof(bm), &bm) == sizeof(bm);
+        BITMAP mask = {};
+        ok = GetObject(ii.hbmMask, sizeof(mask), &mask) == sizeof(mask);
         assert(ok);
 
-        if (ii.hbmMask)
-            DeleteObject(ii.hbmMask);
-        if (ii.hbmColor)
-            DeleteObject(ii.hbmColor);
-
-        SIZE size = {
-            bm.bmWidth,
-            ii.hbmColor ? bm.bmHeight : bm.bmHeight / 2,
+        POINT size = {
+            mask.bmWidth,
+            ii.hbmColor ? mask.bmHeight : mask.bmHeight / 2,
         };
+
+        if (ii.hbmMask) {
+            DeleteObject(ii.hbmMask);
+            ii.hbmMask = nullptr;
+        }
+        if (ii.hbmColor) {
+            DeleteObject(ii.hbmColor);
+            ii.hbmColor = nullptr;
+        }
+
         return size;
     }
 };
