@@ -3,6 +3,7 @@
 #include <tuple>
 #include <Windows.h>
 #include "../IconMonitorHook/Message.hpp"
+#include "Sandboxing.hpp"
 
 
 struct PIPEINST : public OVERLAPPED {
@@ -32,6 +33,9 @@ struct PIPEINST : public OVERLAPPED {
 
 std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id) {
     std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
+
+    // impersonation doesn't work here
+    //ImpersonateThread impersonate(IntegrityLevel::Low, GetCurrentProcess());
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
         PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // read/write access | overlapped mode
