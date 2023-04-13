@@ -19,7 +19,9 @@ static HANDLE InitializePipe() {
         0,              // default attributes 
         NULL);          // no template file 
     if (pipe == INVALID_HANDLE_VALUE) {
-        // will fail when loaded in host process
+        DWORD err = GetLastError();
+        assert((err != ERROR_ACCESS_DENIED) && "when trying to open pipe"); // sandboxing problem
+        assert(err == ERROR_FILE_NOT_FOUND); // expected when loaded in host process
         return 0;
     }
 
