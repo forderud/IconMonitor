@@ -2,8 +2,10 @@
 #include <iostream>
 #include <tuple>
 #include <Windows.h>
+#include <aclapi.h> // for SE_KERNEL_OBJECT
+#include <sddl.h> // for SDDL_REVISION_1
+
 #include "../IconMonitorHook/Message.hpp"
-#include "Sandboxing.hpp"
 
 
 struct PIPEINST : public OVERLAPPED {
@@ -57,19 +59,23 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 
     if (first) {
         ACL* sacl = nullptr; // system access control list (weak ptr.)
-        LocalWrap<PSECURITY_DESCRIPTOR> SD; // must outlive SetNamedSecurityInfo to avoid sporadic failures
+        PSECURITY_DESCRIPTOR sd = {}; // must outlive SetSecurityInfo to avoid sporadic failures
         {
             // initialize "low IL" System Access Control List (SACL)
             // Security Descriptor String interpretation: (based on sddl.h)
             // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
-            WIN32_CHECK(ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &SD, NULL));
+            BOOL ok  = ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &sd, NULL);
+            assert(ok);
             BOOL sacl_present = FALSE;
             BOOL sacl_defaulted = FALSE;
-            WIN32_CHECK(GetSecurityDescriptorSacl(SD, &sacl_present, &sacl, &sacl_defaulted));
+            ok = GetSecurityDescriptorSacl(sd, &sacl_present, &sacl, &sacl_defaulted);
+            assert(ok);
         }
         DWORD res = SetSecurityInfo(pipe, SE_KERNEL_OBJECT, LABEL_SECURITY_INFORMATION, /*owner*/NULL, /*group*/NULL, /*dacl*/NULL, sacl);
         assert((res != ERROR_ACCESS_DENIED) && "when modifying pipe permissions"); // sandboxing problem
         assert((res == ERROR_SUCCESS) && "when modifying pipe permissions"); // sandboxing problem
+
+        LocalFree(sd);
     }
 
     // connect to the new client. 
