@@ -33,7 +33,7 @@ struct PIPEINST : public OVERLAPPED {
 };
 
 
-std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first) {
+std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first_open) {
     std::wstring pipe_name = PIPE_NAME_BASE;
 #ifdef _DEBUG
     pipe_name += L"debug"; // deterministic pipe name in debug builds
@@ -42,7 +42,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 #endif
 
     DWORD mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED; // read/write access | overlapped mode
-    if (first)
+    if (first_open)
         mode |= WRITE_OWNER; // enable changing permissions
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
@@ -57,7 +57,8 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         NULL);                    // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
-    if (first) {
+    if (first_open) {
+        // change permissions to: Low Mandatory Level [No-Write-Up]
         ACL* sacl = nullptr; // system access control list (weak ptr.)
         PSECURITY_DESCRIPTOR sd = {}; // must outlive SetSecurityInfo to avoid sporadic failures
         {
