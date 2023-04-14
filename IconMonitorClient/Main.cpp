@@ -31,14 +31,15 @@ struct PIPEINST : public OVERLAPPED {
 };
 
 
-std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id) {
+std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first) {
     std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
 
-    // impersonation doesn't work here
-    //ImpersonateThread impersonate(IntegrityLevel::Low, GetCurrentProcess());
+    DWORD mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED; // read/write access | overlapped mode
+    if (first)
+        mode |= WRITE_OWNER; // enable changing permissions
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
-        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // read/write access | overlapped mode
+        mode, // read/write access | overlapped mode
         PIPE_TYPE_MESSAGE |       // message-type pipe 
         PIPE_READMODE_MESSAGE |   // message read mode 
         PIPE_WAIT,                // blocking mode 
@@ -49,22 +50,22 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         NULL);                    // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
-#if 0
-    ACL* sacl = nullptr; // system access control list (weak ptr.)
-    LocalWrap<PSECURITY_DESCRIPTOR> SD; // must outlive SetNamedSecurityInfo to avoid sporadic failures
-    {
-        // initialize "low IL" System Access Control List (SACL)
-        // Security Descriptor String interpretation: (based on sddl.h)
-        // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
-        WIN32_CHECK(ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &SD, NULL));
-        BOOL sacl_present = FALSE;
-        BOOL sacl_defaulted = FALSE;
-        WIN32_CHECK(GetSecurityDescriptorSacl(SD, &sacl_present, &sacl, &sacl_defaulted));
+    if (first) {
+        ACL* sacl = nullptr; // system access control list (weak ptr.)
+        LocalWrap<PSECURITY_DESCRIPTOR> SD; // must outlive SetNamedSecurityInfo to avoid sporadic failures
+        {
+            // initialize "low IL" System Access Control List (SACL)
+            // Security Descriptor String interpretation: (based on sddl.h)
+            // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
+            WIN32_CHECK(ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &SD, NULL));
+            BOOL sacl_present = FALSE;
+            BOOL sacl_defaulted = FALSE;
+            WIN32_CHECK(GetSecurityDescriptorSacl(SD, &sacl_present, &sacl, &sacl_defaulted));
+        }
+        DWORD res = SetSecurityInfo(pipe, SE_KERNEL_OBJECT, LABEL_SECURITY_INFORMATION, /*owner*/NULL, /*group*/NULL, /*dacl*/NULL, sacl);
+        assert((res != ERROR_ACCESS_DENIED) && "when modifying pipe permissions"); // sandboxing problem
+        assert((res == ERROR_SUCCESS) && "when modifying pipe permissions"); // sandboxing problem
     }
-    DWORD res = SetSecurityInfo(pipe, SE_KERNEL_OBJECT, LABEL_SECURITY_INFORMATION, /*owner*/NULL, /*group*/NULL, /*dacl*/NULL, sacl);
-    assert((res != ERROR_ACCESS_DENIED) && "when modifying pipe permissions"); // sandboxing problem
-    assert((res == ERROR_SUCCESS) && "when modifying pipe permissions"); // sandboxing problem
-#endif
 
     // connect to the new client. 
     // wait for client to connect
@@ -135,7 +136,7 @@ int main(int argc, char* argv[]) {
 
     BOOL  pending_io = false;
     HANDLE pipe = 0;
-    std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
+    std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id, true);
 
     while(pipe) {
         // Wait for a client to connect, or for a read or write operation to be completed,
@@ -162,7 +163,7 @@ int main(int argc, char* argv[]) {
             pending_io = false;
 
             // Create new pipe instance for the next client. 
-            std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
+            std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id, false);
             break;
         }
 
