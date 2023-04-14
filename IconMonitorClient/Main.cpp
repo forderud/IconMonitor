@@ -62,7 +62,8 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         WIN32_CHECK(GetSecurityDescriptorSacl(SD, &sacl_present, &sacl, &sacl_defaulted));
     }
     DWORD res = SetSecurityInfo(pipe, SE_KERNEL_OBJECT, LABEL_SECURITY_INFORMATION, /*owner*/NULL, /*group*/NULL, /*dacl*/NULL, sacl);
-    assert(res == ERROR_SUCCESS);
+    assert((res != ERROR_ACCESS_DENIED) && "when modifying pipe permissions"); // sandboxing problem
+    assert((res == ERROR_SUCCESS) && "when modifying pipe permissions"); // sandboxing problem
 #endif
 
     // connect to the new client. 
