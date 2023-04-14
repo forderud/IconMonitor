@@ -32,7 +32,12 @@ struct PIPEINST : public OVERLAPPED {
 
 
 std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first) {
-    std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
+    std::wstring pipe_name = PIPE_NAME_BASE;
+#ifdef _DEBUG
+    pipe_name += L"debug"; // deterministic pipe name in debug builds
+#else
+    pipe_name += std::to_wstring(thread_id);
+#endif
 
     DWORD mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED; // read/write access | overlapped mode
     if (first)

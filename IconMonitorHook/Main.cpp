@@ -9,7 +9,12 @@ static HANDLE g_pipe = 0;
 
 static HANDLE InitializePipe() {
     DWORD thread_id = GetCurrentThreadId();
-    std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
+    std::wstring pipe_name = PIPE_NAME_BASE;
+#ifdef _DEBUG
+    pipe_name += L"debug"; // deterministic pipe name in debug builds
+#else
+    pipe_name += std::to_wstring(thread_id);
+#endif
 
     // TODO: Consider replacing with CallNamedPipeW
     HANDLE pipe = CreateFileW(pipe_name.c_str(), GENERIC_READ | GENERIC_WRITE,
