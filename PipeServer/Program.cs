@@ -61,19 +61,16 @@ class PipeServer
             securityAttributes.bInheritHandle = 1;
             securityAttributes.lpSecurityDescriptor = securityDescriptorPtr;
 
-            SafePipeHandle handle = CreateNamedPipe(@"\\.\pipe\" + pipeName,
-                PipeDirection.InOut, PipeOptions.Asynchronous,
-                0, 0, securityAttributes);
+            SafePipeHandle handle = CreateNamedPipe(@"\\.\pipe\" + pipeName, 0, 0, securityAttributes);
             if (handle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             return handle;
         }
 
-        private static SafePipeHandle CreateNamedPipe(string fullPipeName, PipeDirection direction, PipeOptions options,
-            int inBufferSize, int outBufferSize, SECURITY_ATTRIBUTES secAttrs)
+        private static SafePipeHandle CreateNamedPipe(string fullPipeName, int inBufferSize, int outBufferSize, SECURITY_ATTRIBUTES secAttrs)
         {
-            int openMode = (int)direction | (int)options;
+            int openMode = (int)PipeDirection.InOut | (int)PipeOptions.Asynchronous;
             int pipeMode = 4 + 2 + 0; // PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
             int maxNumberOfServerInstances = 255;
             SafePipeHandle handle = CreateNamedPipe(fullPipeName, openMode, pipeMode,
@@ -87,12 +84,10 @@ class PipeServer
         {
             const string LOW_INTEGRITY_LABEL_SACL = "S:(ML;;NW;;;LW)";
             const string EVERYONE_CLIENT_ACE = "(A;;0x12019b;;;WD)";
-            const string CALLER_ACE_TEMPLATE = "(A;;0x12019f;;;{0})";
 
             StringBuilder sb = new StringBuilder();
             sb.Append(LOW_INTEGRITY_LABEL_SACL);
             sb.Append("D:"+EVERYONE_CLIENT_ACE);
-            //sb.AppendFormat(CALLER_ACE_TEMPLATE, WindowsIdentity.GetCurrent().Owner.Value);
             return sb.ToString();
         }
 
