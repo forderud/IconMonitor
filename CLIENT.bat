@@ -1,3 +1,3 @@
-icacls PipeClient\bin\Debug\net6.0\PipeClient.exe /setintegritylevel Low
+icacls x64\Debug\MyWindowsApp.exe /setintegritylevel Low
 
-PipeClient\bin\Debug\net6.0\PipeClient.exe
+x64\Debug\MyWindowsApp.exe

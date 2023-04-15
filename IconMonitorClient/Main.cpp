@@ -39,7 +39,7 @@ int PIPEINST::s_count = 0;
 
 /** Creates a pipe instance and connects to the client.
     Returns TRUE if the connect operation is pending, and FALSE if the connection has been completed. */
-std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first_open) {
+std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id) {
     std::wstring pipe_name = PIPE_NAME_BASE;
 #ifdef _DEBUG
     pipe_name += L"debug"; // deterministic pipe name in debug builds
@@ -48,8 +48,21 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 #endif
 
     DWORD mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED; // read/write access | overlapped mode
-    if (first_open)
-        mode |= WRITE_OWNER; // enable changing permissions
+    //mode |= WRITE_OWNER; // enable changing permissions
+
+    SECURITY_ATTRIBUTES sa = {}; // must outlive CreateNamedPipe to avoid sporadic failures
+    sa.nLength = sizeof(sa);
+    sa.bInheritHandle = false;
+
+    {
+        // initialize "low IL" System Access Control List (SACL)
+        // Security Descriptor String interpretation: (based on sddl.h)
+        // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
+        std::wstring sd_str = L"S:(ML;;NW;;;LW)";
+        sd_str += L"D:(A;;0x12019b;;;WD)"; // EVERYONE_CLIENT_ACE
+        BOOL ok = ConvertStringSecurityDescriptorToSecurityDescriptorW(sd_str.c_str(), SDDL_REVISION_1, &sa.lpSecurityDescriptor, NULL);
+        assert(ok);
+    }
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
         mode, // read/write access | overlapped mode
@@ -58,31 +71,10 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         sizeof(IconUpdateMessage),// output buffer size 
         sizeof(IconUpdateMessage),// input buffer size 
         PIPE_TIMEOUT,             // client time-out 
-        NULL);                    // security
+        &sa);                     // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
-    if (first_open) {
-        // change permissions to: Low Mandatory Level [No-Write-Up]
-        ACL* sacl = nullptr; // system access control list (weak ptr.)
-        PSECURITY_DESCRIPTOR sd = {}; // must outlive SetSecurityInfo to avoid sporadic failures
-        {
-            // initialize "low IL" System Access Control List (SACL)
-            // Security Descriptor String interpretation: (based on sddl.h)
-            // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
-            std::wstring sd_str = L"S:(ML;;NW;;;LW)";
-            BOOL ok = ConvertStringSecurityDescriptorToSecurityDescriptorW(sd_str.c_str(), SDDL_REVISION_1, &sd, NULL);
-            assert(ok);
-            BOOL sacl_present = FALSE;
-            BOOL sacl_defaulted = FALSE;
-            ok = GetSecurityDescriptorSacl(sd, &sacl_present, &sacl, &sacl_defaulted);
-            assert(ok);
-        }
-        DWORD res = SetSecurityInfo(pipe, SE_KERNEL_OBJECT, LABEL_SECURITY_INFORMATION, /*owner*/NULL, /*group*/NULL, /*dacl*/NULL, sacl);
-        assert((res != ERROR_ACCESS_DENIED) && "when modifying pipe permissions"); // sandboxing problem
-        assert((res == ERROR_SUCCESS) && "when modifying pipe permissions"); // sandboxing problem
-
-        LocalFree(sd);
-    }
+    LocalFree(sa.lpSecurityDescriptor);
 
     // connect to the new client. 
     // wait for client to connect
@@ -153,7 +145,7 @@ int main(int argc, char* argv[]) {
 
     BOOL  pending_io = false;
     HANDLE pipe = 0;
-    std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id, true);
+    std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
     while(pipe) {
         // Wait for a client to connect, or for a read or write operation to be completed,
