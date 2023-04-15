@@ -40,15 +40,7 @@ int PIPEINST::s_count = 0;
 /** Creates a pipe instance and connects to the client.
     Returns TRUE if the connect operation is pending, and FALSE if the connection has been completed. */
 std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id) {
-    std::wstring pipe_name = PIPE_NAME_BASE;
-#ifdef _DEBUG
-    pipe_name += L"debug"; // deterministic pipe name in debug builds
-#else
-    pipe_name += std::to_wstring(thread_id);
-#endif
-
-    DWORD mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED; // read/write access | overlapped mode
-    //mode |= WRITE_OWNER; // enable changing permissions
+    std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
 
     SECURITY_ATTRIBUTES sa = {}; // must outlive CreateNamedPipe to avoid sporadic failures
     sa.nLength = sizeof(sa);
@@ -65,7 +57,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
     }
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
-        mode, // read/write access | overlapped mode
+        PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // read/write access | overlapped mode
         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, // message-type, message read, blocking
         PIPE_UNLIMITED_INSTANCES, // unlimited instances 
         sizeof(IconUpdateMessage),// output buffer size 
