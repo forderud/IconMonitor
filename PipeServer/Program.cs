@@ -2,6 +2,8 @@
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Security.Principal;
+using System.Text;
 
 class PipeServer
 {
@@ -44,15 +46,13 @@ class PipeServer
             public int bInheritHandle;
         }
 
-        private const string LOW_INTEGRITY_SSL_SACL = "S:(ML;;NW;;;LW)";
-
         public static SafePipeHandle CreateLowIntegrityNamedPipe(string pipeName)
         {
             // convert the security descriptor
             IntPtr securityDescriptorPtr = IntPtr.Zero;
             int securityDescriptorSize = 0;
             bool result = ConvertStringSecurityDescriptorToSecurityDescriptor(
-                LOW_INTEGRITY_SSL_SACL, 1, out securityDescriptorPtr, out securityDescriptorSize);
+                CreateSddlForPipeSecurity(), 1, out securityDescriptorPtr, out securityDescriptorSize);
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
@@ -84,6 +84,19 @@ class PipeServer
             if (handle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             return handle;
+        }
+
+        private static string CreateSddlForPipeSecurity()
+        {
+            const string LOW_INTEGRITY_LABEL_SACL = "S:(ML;;NW;;;LW)";
+            const string EVERYONE_CLIENT_ACE = "(A;;0x12019b;;;WD)";
+            const string CALLER_ACE_TEMPLATE = "(A;;0x12019f;;;{0})";
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(LOW_INTEGRITY_LABEL_SACL);
+            sb.Append("D:"+EVERYONE_CLIENT_ACE);
+            //sb.AppendFormat(CALLER_ACE_TEMPLATE, WindowsIdentity.GetCurrent().Owner.Value);
+            return sb.ToString();
         }
 
     }
