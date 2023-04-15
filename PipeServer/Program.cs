@@ -64,20 +64,13 @@ class PipeServer
             securityAttributes.bInheritHandle = 1;
             securityAttributes.lpSecurityDescriptor = securityDescriptorPtr;
 
-            SafePipeHandle handle = CreateNamedPipe(@"\\.\pipe\" + pipeName, 0, 0, securityAttributes);
-            if (handle.IsInvalid)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-
-            return handle;
-        }
-
-        private static SafePipeHandle CreateNamedPipe(string fullPipeName, int inBufferSize, int outBufferSize, SECURITY_ATTRIBUTES secAttrs)
-        {
             int openMode = (int)PipeDirection.InOut | (int)PipeOptions.Asynchronous;
             int pipeMode = 4 + 2 + 0; // PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
             int maxNumberOfServerInstances = 255;
-            SafePipeHandle handle = CreateNamedPipe(fullPipeName, openMode, pipeMode,
-                maxNumberOfServerInstances, outBufferSize, inBufferSize, 0, secAttrs);
+            int inBufferSize = 0;
+            int outBufferSize = 0;
+            SafePipeHandle handle = CreateNamedPipe(@"\\.\pipe\" + pipeName, openMode, pipeMode,
+                maxNumberOfServerInstances, outBufferSize, inBufferSize, 0, securityAttributes);
             if (handle.IsInvalid)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             return handle;
