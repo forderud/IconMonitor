@@ -47,9 +47,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
         mode, // read/write access | overlapped mode
-        PIPE_TYPE_MESSAGE |       // message-type pipe 
-        PIPE_READMODE_MESSAGE |   // message read mode 
-        PIPE_WAIT,                // blocking mode 
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, // message-type, message read, blocking
         PIPE_UNLIMITED_INSTANCES, // unlimited instances 
         sizeof(IconUpdateMessage),// output buffer size 
         sizeof(IconUpdateMessage),// input buffer size 
