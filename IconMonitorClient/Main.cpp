@@ -65,7 +65,8 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
             // initialize "low IL" System Access Control List (SACL)
             // Security Descriptor String interpretation: (based on sddl.h)
             // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
-            BOOL ok  = ConvertStringSecurityDescriptorToSecurityDescriptorW(L"S:(ML;;NW;;;LW)", SDDL_REVISION_1, &sd, NULL);
+            std::wstring sd_str = L"S:(ML;;NW;;;LW)";
+            BOOL ok = ConvertStringSecurityDescriptorToSecurityDescriptorW(sd_str.c_str(), SDDL_REVISION_1, &sd, NULL);
             assert(ok);
             BOOL sacl_present = FALSE;
             BOOL sacl_defaulted = FALSE;
