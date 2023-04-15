@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IconMonitorHook", "IconMoni
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyWindowsApp", "MyWindowsApp\MyWindowsApp.vcxproj", "{EDA38863-F423-435F-A364-750FE08A10DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipeServer", "PipeServer\PipeServer.csproj", "{D638AD1C-81BD-4530-86EF-C8C57A5A5BF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipeClient", "PipeClient\PipeClient.csproj", "{E10637A5-AD7E-4229-B9A4-5C0B174BF127}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -27,6 +31,14 @@ Global
 		{EDA38863-F423-435F-A364-750FE08A10DE}.Debug|x64.Build.0 = Debug|x64
 		{EDA38863-F423-435F-A364-750FE08A10DE}.Release|x64.ActiveCfg = Release|x64
 		{EDA38863-F423-435F-A364-750FE08A10DE}.Release|x64.Build.0 = Release|x64
+		{D638AD1C-81BD-4530-86EF-C8C57A5A5BF1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D638AD1C-81BD-4530-86EF-C8C57A5A5BF1}.Debug|x64.Build.0 = Debug|Any CPU
+		{D638AD1C-81BD-4530-86EF-C8C57A5A5BF1}.Release|x64.ActiveCfg = Release|Any CPU
+		{D638AD1C-81BD-4530-86EF-C8C57A5A5BF1}.Release|x64.Build.0 = Release|Any CPU
+		{E10637A5-AD7E-4229-B9A4-5C0B174BF127}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E10637A5-AD7E-4229-B9A4-5C0B174BF127}.Debug|x64.Build.0 = Debug|Any CPU
+		{E10637A5-AD7E-4229-B9A4-5C0B174BF127}.Release|x64.ActiveCfg = Release|Any CPU
+		{E10637A5-AD7E-4229-B9A4-5C0B174BF127}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
