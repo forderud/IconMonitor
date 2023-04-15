@@ -50,6 +50,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         // Security Descriptor String interpretation: (based on sddl.h)
         // SACL:(ace_type=Mandatory integrity Label (ML); ace_flags=; rights=SDDL_NO_WRITE_UP (NW); object_guid=; inherit_object_guid=; account_sid=Low mandatory level (LW))
         std::wstring sd_str = L"S:(ML;;NW;;;LW)";
+        // DACL:(ace_type=Allowed; ace_flags=; rights=0x12019b; object_guid=; inherit_object_guid=; account_sid=Everyone)
         sd_str += L"D:(A;;0x12019b;;;WD)"; // EVERYONE_CLIENT_ACE
         BOOL ok = ConvertStringSecurityDescriptorToSecurityDescriptorW(sd_str.c_str(), SDDL_REVISION_1, &sa.lpSecurityDescriptor, NULL);
         assert(ok);
