@@ -20,6 +20,16 @@ class PipeServer
     private static void HandleConnection(IAsyncResult ar)
     {
         Console.WriteLine("Received connection");
+
+        NamedPipeServerStream pipeServer = (NamedPipeServerStream)ar.AsyncState;
+
+        while (true) {
+            byte[] buffer = new byte[255];
+            int res = pipeServer.Read(buffer);
+            if (res == 0)
+                return;
+            Console.WriteLine(Encoding.Default.GetString(buffer));
+        }
     }
 
 
