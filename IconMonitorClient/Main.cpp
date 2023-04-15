@@ -11,6 +11,7 @@
 struct PIPEINST : public OVERLAPPED {
     PIPEINST(HANDLE _pipe) : pipe(_pipe) {
         assert(_pipe);
+        s_count++;
         // clear inherited fields
         Internal = 0;
         InternalHigh = 0;
@@ -24,15 +25,20 @@ struct PIPEINST : public OVERLAPPED {
         CloseHandle(pipe);
 
         printf("Pipe disconnected.\n");
+        s_count--;
     }
 
     HANDLE pipe = 0;
 
     // read message
     IconUpdateMessage request;
+
+    static int s_count; // instance count
 };
+int PIPEINST::s_count = 0;
 
-
+/** Creates a pipe instance and connects to the client.
+    Returns TRUE if the connect operation is pending, and FALSE if the connection has been completed. */
 std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thread_id, bool first_open) {
     std::wstring pipe_name = PIPE_NAME_BASE;
 #ifdef _DEBUG
@@ -154,9 +160,9 @@ int main(int argc, char* argv[]) {
         // which causes a completion routine to be queued for execution. 
         DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
+        // The wait conditions are satisfied by a completed connect operation. 
         switch (res) {
         case WAIT_OBJECT_0:
-            // The wait conditions are satisfied by a completed connect operation. 
         {
             // If an operation is pending, get the result of the connect operation. 
             if (pending_io) {
@@ -172,9 +178,6 @@ int main(int argc, char* argv[]) {
             CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
             pipe = 0;
             pending_io = false;
-
-            // Create new pipe instance for the next client. 
-            std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id, false);
             break;
         }
 
@@ -189,6 +192,9 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // never reached
+    while (PIPEINST::s_count > 0) {
+        SleepEx(1000, true); // returns immediately on alert 
+    }
+
     return 0;
 }
