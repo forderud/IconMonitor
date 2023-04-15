@@ -49,10 +49,13 @@ class PipeServer
         public static SafePipeHandle CreateLowIntegrityNamedPipe(string pipeName)
         {
             // convert the security descriptor
+            const string LOW_INTEGRITY_LABEL_SACL = "S:(ML;;NW;;;LW)";
+            const string EVERYONE_CLIENT_ACE = "D:(A;;0x12019b;;;WD)";
+
             IntPtr securityDescriptorPtr = IntPtr.Zero;
             int securityDescriptorSize = 0;
             bool result = ConvertStringSecurityDescriptorToSecurityDescriptor(
-                CreateSddlForPipeSecurity(), 1, out securityDescriptorPtr, out securityDescriptorSize);
+                LOW_INTEGRITY_LABEL_SACL + EVERYONE_CLIENT_ACE, 1, out securityDescriptorPtr, out securityDescriptorSize);
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
@@ -79,17 +82,5 @@ class PipeServer
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             return handle;
         }
-
-        private static string CreateSddlForPipeSecurity()
-        {
-            const string LOW_INTEGRITY_LABEL_SACL = "S:(ML;;NW;;;LW)";
-            const string EVERYONE_CLIENT_ACE = "(A;;0x12019b;;;WD)";
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append(LOW_INTEGRITY_LABEL_SACL);
-            sb.Append("D:"+EVERYONE_CLIENT_ACE);
-            return sb.ToString();
-        }
-
     }
 }
