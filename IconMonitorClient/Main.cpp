@@ -2,7 +2,6 @@
 #include <iostream>
 #include <tuple>
 #include <Windows.h>
-#include <aclapi.h> // for SE_KERNEL_OBJECT
 #include <sddl.h> // for SDDL_REVISION_1
 
 #include "../IconMonitorHook/Message.hpp"
