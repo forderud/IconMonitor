@@ -21,8 +21,8 @@ static HANDLE InitializePipe() {
     if (pipe == INVALID_HANDLE_VALUE) {
         DWORD err = GetLastError();
         assert((err != ERROR_ACCESS_DENIED) && "when trying to open pipe"); // sandboxing problem
-        assert(err == ERROR_FILE_NOT_FOUND); // expected when loaded in host process
-        return 0;
+        assert(false);
+        abort();
     }
 
     // change pipe from byte- to message-mode
@@ -60,6 +60,11 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
     if (!sent_by_current_proc)
         CallNextHookEx(NULL, code, sent_by_current_proc, param);
 
+    if (!g_pipe) {
+        // on-demand pipe opening
+        g_pipe = InitializePipe();
+    }
+
     auto* cwp = (CWPRETSTRUCT*)param;
 
     // filter successful actions for the specified window
@@ -78,7 +83,7 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  nReason, LPVOID lpReserved) {
     switch (nReason) {
     case DLL_PROCESS_ATTACH:
-        g_pipe = InitializePipe();
+        // delay load pipe
         break;
     case DLL_PROCESS_DETACH:
         if (g_pipe) {
