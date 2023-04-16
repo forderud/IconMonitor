@@ -59,11 +59,11 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
     HANDLE pipe = CreateNamedPipeW(pipe_name.c_str(),
         PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // read/write access | overlapped mode
         PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, // message-type, message read, blocking
-        PIPE_UNLIMITED_INSTANCES, // unlimited instances 
-        sizeof(IconUpdateMessage),// output buffer size 
-        sizeof(IconUpdateMessage),// input buffer size 
-        PIPE_TIMEOUT,             // client time-out 
-        &sa);                     // security
+        PIPE_UNLIMITED_INSTANCES,   // unlimited instances 
+        0,                          // output buffer size (empty)
+        4*sizeof(IconUpdateMessage),// input buffer size (allow 4 unprocessed icon updates before the process freezes)
+        PIPE_TIMEOUT,               // client time-out 
+        &sa);                       // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
     LocalFree(sa.lpSecurityDescriptor);
