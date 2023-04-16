@@ -11,7 +11,7 @@ static HANDLE InitializePipe() {
     DWORD thread_id = GetCurrentThreadId();
     std::wstring pipe_name = PIPE_NAME_BASE + std::to_wstring(thread_id);
 
-    // TODO: Consider replacing with CallNamedPipeW
+    // connect to existing pipe
     HANDLE pipe = CreateFileW(pipe_name.c_str(), GENERIC_READ | GENERIC_WRITE,
         0,              // no sharing 
         NULL,           // default security attributes
