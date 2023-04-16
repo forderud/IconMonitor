@@ -62,7 +62,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         PIPE_UNLIMITED_INSTANCES,   // unlimited instances 
         0,                          // output buffer size (empty)
         4*sizeof(IconUpdateMessage),// input buffer size (allow 4 unprocessed icon updates before the process freezes)
-        PIPE_TIMEOUT,               // client time-out 
+        1000,                       // client time-out [ms]
         &sa);                       // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
