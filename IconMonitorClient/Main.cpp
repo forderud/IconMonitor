@@ -86,8 +86,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 
     default:
         // error occured during the connect operation... 
-        printf("ConnectNamedPipe failed with %d.\n", GetLastError());
-        assert(false);
+        assert(false && "ConnectNamedPipe failure");
         abort();
     }
 }
@@ -153,8 +152,8 @@ int main(int argc, char* argv[]) {
                 DWORD bytes_xfered = 0;
                 BOOL ok = GetOverlappedResult(pipe, &connect, &bytes_xfered, false); // non-blocking
                 if (!ok) {
-                    printf("ConnectNamedPipe (%d)\n", GetLastError());
-                    return 0;
+                    assert(false && "ConnectNamedPipe failure");
+                    abort();
                 }
             }
 
@@ -170,9 +169,8 @@ int main(int argc, char* argv[]) {
             break;
 
         default:
-            // An error occurred in the wait function.
-            printf("WaitForSingleObjectEx (%d)\n", GetLastError());
-            exit(-2);
+            assert(false && "WaitForSingleObjectEx failure");
+            abort();
         }
     }
 
