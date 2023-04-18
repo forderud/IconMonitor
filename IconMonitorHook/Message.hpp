@@ -14,13 +14,13 @@ public:
         return window || param || icon;
     }
 
-    std::string ToString() const {
-        std::string result = "[IconUpdateMessage] window=" + std::to_string((size_t)window)
-            + ", param=" + std::to_string(param)
-            + ", icon=" + std::to_string((size_t)icon);
+    std::wstring ToString() const {
+        std::wstring result = L"[IconUpdateMessage] window=" + std::to_wstring((size_t)window)
+            + L", param=" + std::to_wstring(param)
+            + L", icon=" + std::to_wstring((size_t)icon);
 
         auto size = IconSize(icon);
-        result += " size={" + std::to_string(size.x) + "," + std::to_string(size.y) + "}\n";
+        result += L" size={" + std::to_wstring(size.x) + L"," + std::to_wstring(size.y) + L"}";
         return result;
     }
 

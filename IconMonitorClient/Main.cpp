@@ -23,7 +23,7 @@ struct PIPEINST : public OVERLAPPED {
         assert(ok);
         CloseHandle(pipe);
 
-        printf("Pipe disconnected.\n");
+        std::wcout << L"Pipe disconnected." << std::endl;
         s_count--;
     }
 
@@ -103,7 +103,7 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
 
     // print result of previous read
     if (pipeInst->request.IsValid())
-        printf(pipeInst->request.ToString().c_str());
+        std::wcout << pipeInst->request.ToString() << std::endl;
 
     // schedule next read
     BOOL ok = ReadFileEx(pipeInst->pipe, &pipeInst->request, sizeof(pipeInst->request),
@@ -113,18 +113,18 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
 }
 
 int main(int argc, char* argv[]) {
-    printf("IconMonitorClient.\n");
+    std::wcout << L"IconMonitorClient." << std::endl;
 
     if (argc < 2) {
-        std::cerr << "ERROR: Please provide a thread handle as argument.\n";
+        std::wcerr << L"ERROR: Please provide a thread handle as argument.\n";
         exit(-1);
     }
 
     DWORD thread_id = std::stoi(argv[1]);
-    std::cerr << "Injecting hook DLL into proces with thread-id=" << thread_id << std::endl;
+    std::wcout << L"Injecting hook DLL into proces with thread-id=" << thread_id << std::endl;
     MonitorIconUpdate monitor(thread_id);
     if (!monitor) {
-        std::cerr << "ERROR: Invalid thread handle argument.\n";
+        std::wcerr << L"ERROR: Invalid thread handle argument.\n";
         exit(-1);
     }
 
