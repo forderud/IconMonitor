@@ -78,13 +78,15 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         return { true, pipe };
 
     case ERROR_PIPE_CONNECTED:
-        // Client already connected, so signal an event.
-        // This is unlikely, but can happen if the client connects between CreateNamedPipe and ConnectNamedPipe.
-        if (SetEvent(overlap.hEvent))
-            return { false, pipe };
+        // client connected between CreateNamedPipe and ConnectNamedPipe, so signal event manually
+        if (!SetEvent(overlap.hEvent)) {
+            assert(false && "SetEvent falure");
+            abort();
+        }
+        return { false, pipe };
 
     default:
-        // error occured during the connect operation... 
+        // unknown connection error
         assert(false && "ConnectNamedPipe failure");
         abort();
     }
