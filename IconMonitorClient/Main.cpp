@@ -139,40 +139,37 @@ int main(int argc, char* argv[]) {
     HANDLE pipe = 0;
     std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
-    while(pipe) {
-        // Wait for a client to connect, or for a read or write operation to be completed,
-        // which causes a completion routine to be queued for execution. 
-        DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
+    // wait for client to connect
+    DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
-        // The wait conditions are satisfied by a completed connect operation. 
-        switch (res) {
-        case WAIT_OBJECT_0:
-        {
-            // If an operation is pending, get the result of the connect operation. 
-            if (pending_io) {
-                DWORD bytes_xfered = 0;
-                BOOL ok = GetOverlappedResult(pipe, &connect, &bytes_xfered, false); // non-blocking
-                if (!ok) {
-                    assert(false && "ConnectNamedPipe failure");
-                    abort();
-                }
+    // The wait conditions are satisfied by a completed connect operation. 
+    switch (res) {
+    case WAIT_OBJECT_0:
+    {
+        // If an operation is pending, get the result of the connect operation. 
+        if (pending_io) {
+            DWORD bytes_xfered = 0;
+            BOOL ok = GetOverlappedResult(pipe, &connect, &bytes_xfered, false); // non-blocking
+            if (!ok) {
+                assert(false && "ConnectNamedPipe failure");
+                abort();
             }
-
-            // Start the read operation for this client (move pipe to new PIPEINST object)
-            CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
-            pipe = 0;
-            pending_io = false;
-            break;
         }
 
-        case WAIT_IO_COMPLETION:
-            // The wait is satisfied by a completed read or write operation. This allows the system to execute the completion routine. 
-            break;
+        // Start the read operation for this client (move pipe to new PIPEINST object)
+        CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
+        pipe = 0;
+        pending_io = false;
+        break;
+    }
 
-        default:
-            assert(false && "WaitForSingleObjectEx failure");
-            abort();
-        }
+    case WAIT_IO_COMPLETION:
+        // The wait is satisfied by a completed read or write operation. This allows the system to execute the completion routine. 
+        break;
+
+    default:
+        assert(false && "WaitForSingleObjectEx failure");
+        abort();
     }
 
     while (PIPEINST::s_count > 0) {
