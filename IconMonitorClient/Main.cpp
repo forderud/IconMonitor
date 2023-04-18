@@ -66,10 +66,9 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 
     LocalFree(sa.lpSecurityDescriptor);
 
-    // connect to the new client. 
-    // wait for client to connect
+    // schedule client connection (returns immediately)
     BOOL ok = ConnectNamedPipe(pipe, &overlap);
-    assert(!ok); // overlapped ConnectNamedPipe should fail
+    assert(!ok); // always fail in asynchronous case
 
     DWORD err = GetLastError();
     switch (err) {
