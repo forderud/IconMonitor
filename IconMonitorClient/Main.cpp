@@ -76,8 +76,9 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         // overlapped connection in progress
         return { true, pipe };
 
-    case ERROR_PIPE_CONNECTED:
-        // client connected between CreateNamedPipe and ConnectNamedPipe, so signal event manually
+    case ERROR_PIPE_CONNECTED: // client connected between CreateNamedPipe and ConnectNamedPipe
+    case ERROR_NO_DATA: // pipe closed remotely (probably due to app termination)
+        // signal event manually
         if (!SetEvent(overlap.hEvent)) {
             assert(false && "SetEvent falure");
             abort();
