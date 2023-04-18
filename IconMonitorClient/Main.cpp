@@ -171,9 +171,6 @@ int main(int argc, char* argv[]) {
         break;
 
     case WAIT_IO_COMPLETION:
-        // The wait is satisfied by a completed read or write operation. This allows the system to execute the completion routine. 
-        break;
-
     default:
         assert(false && "WaitForSingleObjectEx failure");
         abort();
