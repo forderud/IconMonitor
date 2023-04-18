@@ -172,6 +172,7 @@ int main(int argc, char* argv[]) {
         abort();
     }
 
+    // process completion routines until all clients are disconnected
     while (PIPEINST::s_count > 0) {
         SleepEx(1000, true); // returns immediately on alert 
     }
