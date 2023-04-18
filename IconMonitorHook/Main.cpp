@@ -29,8 +29,7 @@ static HANDLE InitializePipe() {
     DWORD mode = PIPE_READMODE_MESSAGE;
     BOOL ok = SetNamedPipeHandleState(pipe, &mode, NULL, NULL);
     if (!ok) {
-        printf("SetNamedPipeHandleState failed. GLE=%d\n", GetLastError());
-        assert(false);
+        assert(false && "SetNamedPipeHandleState failure");
         abort();
     }
 
@@ -47,8 +46,7 @@ static void OnIconUpdated(HWND wnd, WPARAM wParam, HICON icon) {
     DWORD bWritten = 0;
     BOOL ok = WriteFile(g_pipe, &msg, sizeof(msg), &bWritten, NULL);
     if (!ok) {
-        printf("WriteFile to pipe failed. GLE=%d\n", GetLastError());
-        assert(false);
+        assert(false && "WriteFile to pipe failed");
         abort();
     }
 }
