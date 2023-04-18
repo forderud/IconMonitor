@@ -140,7 +140,8 @@ int main(int argc, char* argv[]) {
     std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
     // wait for client to connect
-    DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
+    DWORD CLIENT_CONNECT_TIMEOUT = 1000; // [ms]
+    DWORD res = WaitForSingleObjectEx(connect.hEvent, CLIENT_CONNECT_TIMEOUT, true); // alertable wait
 
     // The wait conditions are satisfied by a completed connect operation. 
     switch (res) {
@@ -162,6 +163,12 @@ int main(int argc, char* argv[]) {
         pending_io = false;
         break;
     }
+
+    case WAIT_TIMEOUT:
+        // timeout before client connected
+        pipe = 0;
+        pending_io = false;
+        break;
 
     case WAIT_IO_COMPLETION:
         // The wait is satisfied by a completed read or write operation. This allows the system to execute the completion routine. 
