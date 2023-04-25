@@ -6,7 +6,7 @@
 
 static HICON CreateIconFromRGB(HWND wnd) {
     const uint8_t width = 32, height = 32;
-    std::vector<uint32_t> bitmap(width * height);
+    std::vector<uint32_t> bitmap(width * height, (uint32_t)0);
 
     for (uint8_t y = 0; y < height; y++) {
         for (uint8_t x = 0; x < width; x++) {
@@ -21,7 +21,7 @@ static HICON CreateIconFromRGB(HWND wnd) {
     ICONINFO iconInfo = {};
     iconInfo.fIcon = TRUE;
 
-    iconInfo.hbmColor = CreateBitmap(width, height, 1, 32, bitmap.data());
+    iconInfo.hbmColor = CreateBitmap(width, height, 1, 32/*bit per pixel*/, bitmap.data());
     assert(iconInfo.hbmColor);
 
     // Obtain a handle to the screen device context.
