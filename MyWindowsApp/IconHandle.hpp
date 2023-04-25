@@ -35,7 +35,7 @@ static HICON CreateIconFromRGB(HWND wnd) {
     assert(hIcon);
 
     DeleteObject(iconInfo.hbmMask);
-    ReleaseDC(NULL, hdcScreen);
+    ReleaseDC(wnd, hdcScreen);
     DeleteObject(iconInfo.hbmColor);
 
     return hIcon;
