@@ -59,6 +59,10 @@ public:
         return *this;
     }
 
+    operator bool() const {
+        return m_icon;
+    }
+
 
     void Swap(IconHandle & other) {
         std::swap(m_icon, other.m_icon);

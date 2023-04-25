@@ -14,9 +14,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     // Register the window class.
     const wchar_t CLASS_NAME[] = L"My Window Class";
 
-    m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), false);
-    m_taskbar = IconHandle(CreateIconFromRGB(NULL), true);
-
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
@@ -69,6 +66,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (!m_titlebar) {
+        m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), false);
+        m_taskbar = IconHandle(CreateIconFromRGB(hwnd), true);
+    }
+
     switch (uMsg) {
     case WM_DESTROY:
         PostQuitMessage(0);
