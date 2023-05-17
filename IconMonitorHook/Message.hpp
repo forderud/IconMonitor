@@ -6,7 +6,10 @@ static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
 class BaseMessage {
 public:
-    UINT type = WM_SETICON;
+    BaseMessage(UINT t) : type(t) {
+    }
+
+    const UINT type = 0;
 };
     
 class IconUpdateMessage : public BaseMessage {
@@ -14,6 +17,9 @@ public:
     HWND   window = 0;
     WPARAM param = 0;
     HICON  icon = 0;
+
+    IconUpdateMessage() : BaseMessage(WM_SETICON) {
+    }
 
     bool IsValid() const {
         return window || param || icon;
