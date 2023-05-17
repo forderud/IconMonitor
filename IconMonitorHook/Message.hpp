@@ -4,9 +4,13 @@
 
 static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
-class IconUpdateMessage {
+class BaseMessage {
 public:
-    UINT   type = WM_SETICON;
+    UINT type = WM_SETICON;
+};
+    
+class IconUpdateMessage : public BaseMessage {
+public:
     HWND   window = 0;
     WPARAM param = 0;
     HICON  icon = 0;
