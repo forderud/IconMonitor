@@ -92,10 +92,10 @@ public:
     }
 
     void Initialize(std::wstring title) {
-        size_t title_len = title.length() + 1; // incl. zero-termination
+        size_t title_len = 2*(title.length() + 1); // in bytes incl. zero-termination
         m_buffer.resize(sizeof(BaseMessage) + title_len);
         memcpy(m_buffer.data(), this, sizeof(BaseMessage));
-        memcpy(m_buffer.data(), title.c_str(), title_len);
+        memcpy(m_buffer.data()+sizeof(BaseMessage), title.c_str(), title_len);
     }
 
     void* Ptr() {
