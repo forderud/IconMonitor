@@ -37,8 +37,7 @@ static HANDLE InitializePipe() {
 }
 
 static void OnIconUpdated(HWND wnd, WPARAM wParam, HICON icon) {
-    IconUpdateMessage msg;
-    msg.window = (HWND)wnd;
+    IconUpdateMessage msg((HWND)wnd);
     msg.param = wParam;
     msg.icon = icon;
 

@@ -6,11 +6,11 @@ static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
 class BaseMessage {
 public:
-    BaseMessage(UINT t) : type(t) {
+    BaseMessage(UINT t, HWND wnd) : type(t), window(wnd) {
     }
 
     const UINT type = 0;
-    HWND       window = 0;
+    const HWND window = 0;
 };
     
 class IconUpdateMessage : public BaseMessage {
@@ -18,7 +18,7 @@ public:
     WPARAM param = 0;
     HICON  icon = 0;
 
-    IconUpdateMessage() : BaseMessage(WM_SETICON) {
+    IconUpdateMessage(HWND wnd = 0) : BaseMessage(WM_SETICON, wnd) {
     }
 
     bool IsValid() const {
@@ -88,8 +88,7 @@ private:
 
 class TitlepdateMessage : public BaseMessage {
 public:
-    TitlepdateMessage(HWND wnd) : BaseMessage(WM_SETTEXT) {
-        window = wnd;
+    TitlepdateMessage(HWND wnd) : BaseMessage(WM_SETTEXT, wnd) {
     }
 
     void Initialize(std::wstring title) {
