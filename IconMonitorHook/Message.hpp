@@ -10,11 +10,11 @@ public:
     }
 
     const UINT type = 0;
+    HWND       window = 0;
 };
     
 class IconUpdateMessage : public BaseMessage {
 public:
-    HWND   window = 0;
     WPARAM param = 0;
     HICON  icon = 0;
 
@@ -85,6 +85,32 @@ private:
         return size;
     }
 };
+
+class TitlepdateMessage : public BaseMessage {
+public:
+    TitlepdateMessage(HWND wnd) : BaseMessage(WM_SETTEXT) {
+        window = wnd;
+    }
+
+    void Initialize(std::wstring title) {
+        size_t title_len = title.length() + 1; // incl. zero-termination
+        m_buffer.resize(sizeof(BaseMessage) + title_len);
+        memcpy(m_buffer.data(), this, sizeof(BaseMessage));
+        memcpy(m_buffer.data(), title.c_str(), title_len);
+    }
+
+    void* Ptr() {
+        return m_buffer.data();
+    }
+    DWORD Size() {
+        return (DWORD)m_buffer.size();
+    }
+
+
+private:
+    std::vector<uint8_t> m_buffer;
+};
+
 
 class MonitorIconUpdate {
 public:

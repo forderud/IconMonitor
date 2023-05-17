@@ -52,10 +52,23 @@ static void OnIconUpdated(HWND wnd, WPARAM wParam, HICON icon) {
 }
 
 static void OnTitleUpdated(HWND wnd, wchar_t* title) {
+    TitlepdateMessage msg(wnd);
+    msg.Initialize(title);
+
+#if 0
+    // write message to pipe
+    DWORD bWritten = 0;
+    BOOL ok = WriteFile(g_pipe, msg.Ptr(), msg.Size(), &bWritten, NULL);
+    if (!ok) {
+        assert(false && "WriteFile to pipe failed");
+        abort();
+    }
+#else
     // log window title updates in Visual Studio "Output" window
     OutputDebugStringW(L"WM_SETTEXT: ");
     OutputDebugStringW(title);
     OutputDebugStringW(L"\n");
+#endif
 }
 
 
