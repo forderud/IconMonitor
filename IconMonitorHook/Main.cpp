@@ -71,6 +71,11 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
         if (cwp->message == WM_SETICON) {
             // cwp->lResult contains the prev. icon handle
             OnIconUpdated(cwp->hwnd, cwp->wParam, (HICON)cwp->lParam);
+        } else if (cwp->message == WM_SETTEXT) {
+            // log window title updates in Visual Studio "Output" window
+            OutputDebugStringW(L"WM_SETTEXT: ");
+            OutputDebugStringW((wchar_t*)cwp->lParam);
+            OutputDebugStringW(L"\n");
         }
     }
 

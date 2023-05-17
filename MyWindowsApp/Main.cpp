@@ -67,8 +67,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (!m_titlebar) {
-        m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), false);
-        m_taskbar = IconHandle(CreateIconFromRGB(hwnd), true);
+        m_titlebar = IconHandle(LoadIconW(NULL, IDI_EXCLAMATION), L"Title 1", false);
+        m_taskbar = IconHandle(CreateIconFromRGB(hwnd), L"Title 2", true);
     }
 
     switch (uMsg) {
@@ -91,6 +91,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             m_titlebar.Swap(m_taskbar);
             m_titlebar.Activate(hwnd, ICON_BIG);
             m_taskbar.Activate(hwnd, ICON_SMALL);
+
+            // update window title (will trigger a WM_SETTEXT message)
+            SetWindowTextW(hwnd, m_titlebar.Title());
         }
         break;
     }
