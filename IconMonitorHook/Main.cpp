@@ -51,6 +51,14 @@ static void OnIconUpdated(HWND wnd, WPARAM wParam, HICON icon) {
     }
 }
 
+static void OnTitleUpdated(HWND wnd, wchar_t* title) {
+    // log window title updates in Visual Studio "Output" window
+    OutputDebugStringW(L"WM_SETTEXT: ");
+    OutputDebugStringW(title);
+    OutputDebugStringW(L"\n");
+}
+
+
 extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_current_proc, LPARAM param) {
     if (code < 0) // do not process message 
         return CallNextHookEx(NULL, code, sent_by_current_proc, param);
@@ -72,10 +80,8 @@ extern "C" __declspec(dllexport) LRESULT Hookproc(int code, WPARAM sent_by_curre
             // cwp->lResult contains the prev. icon handle
             OnIconUpdated(cwp->hwnd, cwp->wParam, (HICON)cwp->lParam);
         } else if (cwp->message == WM_SETTEXT) {
-            // log window title updates in Visual Studio "Output" window
-            OutputDebugStringW(L"WM_SETTEXT: ");
-            OutputDebugStringW((wchar_t*)cwp->lParam);
-            OutputDebugStringW(L"\n");
+            // window title updated
+            OnTitleUpdated(cwp->hwnd, (wchar_t*)cwp->lParam);
         }
     }
 
