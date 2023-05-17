@@ -46,7 +46,7 @@ class IconHandle {
 public:
     IconHandle() = default;
 
-    IconHandle(HICON icon, bool destroy) : m_icon(icon), m_destroy(destroy) {
+    IconHandle(HICON icon, std::wstring title, bool destroy) : m_icon(icon), m_title(title), m_destroy(destroy) {
     }
 
     ~IconHandle() {
@@ -64,8 +64,13 @@ public:
     }
 
 
+    const wchar_t* Title() const {
+        return m_title.c_str();
+    }
+
     void Swap(IconHandle & other) {
         std::swap(m_icon, other.m_icon);
+        std::swap(m_title, other.m_title);
         std::swap(m_destroy, other.m_destroy);
     }
 
@@ -79,6 +84,7 @@ public:
         // res contains prev icon handle
     }
 private:
-    HICON m_icon = 0;
-    bool  m_destroy = false; ///< destroy on close
+    HICON        m_icon = 0;
+    std::wstring m_title;
+    bool         m_destroy = false; ///< destroy on close
 };
