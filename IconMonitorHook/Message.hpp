@@ -94,29 +94,29 @@ public:
     TitlepdateMessage(HWND wnd) : BaseMessage(WM_SETTEXT, wnd) {
     }
 
-    void Initialize(std::wstring title) {
-        m_title_len = title.length();
-        if (TitleBytes() > sizeof(m_title))
+    void Initialize(std::wstring new_title) {
+        title_len = new_title.length();
+        if (TitleBytes() > sizeof(title))
             throw std::runtime_error("TitlepdateMessage title overflow");
 
-        memcpy(m_title, title.c_str(), TitleBytes());
+        memcpy(title, new_title.c_str(), TitleBytes());
     }
 
     DWORD Size() {
-        return (DWORD)(sizeof(BaseMessage) + sizeof(m_title_len) + TitleBytes());
+        return (DWORD)(sizeof(BaseMessage) + sizeof(title_len) + TitleBytes());
     }
 
 private:
     size_t TitleBytes() const {
-        assert(m_title_len);
-        return (m_title_len + 1) * sizeof(wchar_t); // number of bytes required, incl. zero-termination
+        assert(title_len);
+        return (title_len + 1) * sizeof(wchar_t); // number of bytes required, incl. zero-termination
     }
 
-    size_t  m_title_len = 0; // title length [characters] (excl. zero-termination)
-    wchar_t m_title[1024] = {};
+    size_t  title_len = 0; // title length [characters] (excl. zero-termination)
+    wchar_t title[1024] = {};
 };
 // verify packed storage
-static_assert(sizeof(TitlepdateMessage) == sizeof(BaseMessage) + sizeof(TitlepdateMessage::m_title_len) + sizeof(TitlepdateMessage::m_title));
+static_assert(sizeof(TitlepdateMessage) == sizeof(BaseMessage) + sizeof(TitlepdateMessage::title_len) + sizeof(TitlepdateMessage::title));
 
 
 class MonitorIconUpdate {
