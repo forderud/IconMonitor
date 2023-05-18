@@ -106,11 +106,13 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
 
     if (err != 0) {
         // previous read failed so clean up and return
+        std::wcerr << L"NOTICE: Read failed. Probably due to disconnect.\n";
         delete pipeInst;
         return;
     }
     if (bRead != sizeof(pipeInst->request)) {
         // previous read truncated so clean up and return
+        std::wcerr << L"NOTICE: Read truncated.\n";
         delete pipeInst;
         return;
     }
