@@ -104,8 +104,13 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
 void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     auto* pipeInst = static_cast<PIPEINST*>(overLap);
 
-    if ((err != 0) || (bRead != sizeof(pipeInst->request))) {
+    if (err != 0) {
         // previous read failed so clean up and return
+        delete pipeInst;
+        return;
+    }
+    if (bRead != sizeof(pipeInst->request)) {
+        // previous read truncated so clean up and return
         delete pipeInst;
         return;
     }
