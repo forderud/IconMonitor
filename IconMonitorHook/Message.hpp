@@ -110,12 +110,11 @@ public:
         memcpy(title, new_title.c_str(), TitleBytes());
     }
 
-    DWORD Size() {
-        return (DWORD)(sizeof(BaseMessage) + sizeof(title_len) + TitleBytes());
-    }
+    std::wstring ToString() const {
+        std::wstring result = L"[TitlepdateMessage] window=" + std::to_wstring((size_t)window);
+        result += L" title=" + std::wstring(title);
 
-    const wchar_t* ToString() const {
-        return title;
+        return result;
     }
 
 private:
