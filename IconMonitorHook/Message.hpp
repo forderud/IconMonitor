@@ -114,6 +114,10 @@ public:
         return (DWORD)(sizeof(BaseMessage) + sizeof(title_len) + TitleBytes());
     }
 
+    const wchar_t* ToString() const {
+        return title;
+    }
+
 private:
     size_t TitleBytes() const {
         assert(title_len);

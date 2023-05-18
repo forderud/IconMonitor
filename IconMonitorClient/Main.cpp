@@ -11,7 +11,7 @@ union AnyMessage {
     AnyMessage() {}
 
     IconUpdateMessage icon;
-    //TitlepdateMessage title;
+    TitlepdateMessage title;
 };
 
 struct PIPEINST : public OVERLAPPED {
@@ -110,7 +110,7 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
         delete pipeInst;
         return;
     }
-    if (bRead != sizeof(pipeInst->request)) {
+    if ((bRead != sizeof(pipeInst->request.icon)) && (bRead != sizeof(pipeInst->request.title))) {
         // previous read truncated so clean up and return
         std::wcerr << L"NOTICE: Read truncated.\n";
         delete pipeInst;
@@ -120,6 +120,8 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     // print result of previous read
     if (pipeInst->request.icon.IsValid())
         std::wcout << pipeInst->request.icon.ToString() << std::endl;
+    else if (pipeInst->request.title.IsValid())
+        std::wcout << pipeInst->request.title.ToString() << std::endl;
 
     // schedule next read
     BOOL ok = ReadFileEx(pipeInst->pipe, &pipeInst->request, sizeof(pipeInst->request),
