@@ -98,6 +98,10 @@ public:
     TitlepdateMessage(HWND wnd) : BaseMessage(WM_SETTEXT, wnd) {
     }
 
+    bool IsValid() const {
+        return BaseMessage::IsValid() && (type == WM_SETTEXT) && title_len;
+    }
+
     void Initialize(std::wstring new_title) {
         title_len = new_title.length();
         if (TitleBytes() > sizeof(title))
