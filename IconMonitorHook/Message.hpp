@@ -9,6 +9,10 @@ public:
     BaseMessage(UINT t, HWND wnd) : type(t), window(wnd) {
     }
 
+    bool IsValid() const {
+        return type && window;
+    }
+
     const UINT type = 0;
     const HWND window = 0;
 };
@@ -22,7 +26,7 @@ public:
     }
 
     bool IsValid() const {
-        return window || param || icon;
+        return BaseMessage::IsValid() && param && icon;
     }
 
     std::wstring ToString() const {
