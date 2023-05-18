@@ -57,7 +57,7 @@ static void OnTitleUpdated(HWND wnd, wchar_t* title) {
 #if 0
     // write message to pipe
     DWORD bWritten = 0;
-    BOOL ok = WriteFile(g_pipe, msg.Ptr(), msg.Size(), &bWritten, NULL);
+    BOOL ok = WriteFile(g_pipe, &msg, msg.Size(), &bWritten, NULL);
     if (!ok) {
         assert(false && "WriteFile to pipe failed");
         abort();
