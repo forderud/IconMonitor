@@ -26,7 +26,7 @@ public:
     }
 
     bool IsValid() const {
-        return BaseMessage::IsValid() && param && icon;
+        return BaseMessage::IsValid() && (type == WM_SETICON) && param && icon;
     }
 
     std::wstring ToString() const {
