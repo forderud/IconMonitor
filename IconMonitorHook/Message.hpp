@@ -85,6 +85,9 @@ private:
         return size;
     }
 };
+// verify packed storage
+static_assert(sizeof(IconUpdateMessage) == sizeof(BaseMessage) + sizeof(IconUpdateMessage::param) + sizeof(IconUpdateMessage::icon));
+
 
 class TitlepdateMessage : public BaseMessage {
 public:
