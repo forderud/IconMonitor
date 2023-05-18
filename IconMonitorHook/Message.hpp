@@ -99,15 +99,17 @@ public:
     }
 
     bool IsValid() const {
-        return BaseMessage::IsValid() && (type == WM_SETTEXT) && title_len;
+        return BaseMessage::IsValid() && (type == WM_SETTEXT) && title[0];
     }
 
     void Initialize(std::wstring new_title) {
-        title_len = new_title.length();
-        if (TitleBytes() > sizeof(title))
+        size_t title_len = new_title.length(); // excl. null-termination
+        size_t title_bytes = (title_len + 1) * sizeof(wchar_t); // number of bytes required, incl. zero-termination
+
+        if (title_bytes > sizeof(title))
             throw std::runtime_error("TitlepdateMessage title overflow");
 
-        memcpy(title, new_title.c_str(), TitleBytes());
+        memcpy(title, new_title.c_str(), title_bytes);
     }
 
     std::wstring ToString() const {
@@ -118,16 +120,10 @@ public:
     }
 
 private:
-    size_t TitleBytes() const {
-        assert(title_len);
-        return (title_len + 1) * sizeof(wchar_t); // number of bytes required, incl. zero-termination
-    }
-
-    size_t  title_len = 0; // title length [characters] (excl. zero-termination)
     wchar_t title[1024] = {};
 };
 // verify packed storage
-static_assert(sizeof(TitlepdateMessage) == sizeof(BaseMessage) + sizeof(TitlepdateMessage::title_len) + sizeof(TitlepdateMessage::title));
+static_assert(sizeof(TitlepdateMessage) == sizeof(BaseMessage) + sizeof(TitlepdateMessage::title));
 
 
 class MonitorIconUpdate {
