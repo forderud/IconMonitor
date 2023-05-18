@@ -7,6 +7,13 @@
 #include "../IconMonitorHook/Message.hpp"
 
 
+union AnyMessage {
+    AnyMessage() {}
+
+    IconUpdateMessage icon;
+    //TitlepdateMessage title;
+};
+
 struct PIPEINST : public OVERLAPPED {
     PIPEINST(HANDLE _pipe) : pipe(_pipe) {
         assert(_pipe);
@@ -30,7 +37,7 @@ struct PIPEINST : public OVERLAPPED {
     HANDLE pipe = 0;
 
     // read message
-    IconUpdateMessage request;
+    AnyMessage request;
 
     static int s_count; // instance count
 };
@@ -104,8 +111,8 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     }
 
     // print result of previous read
-    if (pipeInst->request.IsValid())
-        std::wcout << pipeInst->request.ToString() << std::endl;
+    if (pipeInst->request.icon.IsValid())
+        std::wcout << pipeInst->request.icon.ToString() << std::endl;
 
     // schedule next read
     BOOL ok = ReadFileEx(pipeInst->pipe, &pipeInst->request, sizeof(pipeInst->request),
