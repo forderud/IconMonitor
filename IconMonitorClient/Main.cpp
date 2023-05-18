@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
     }
 
     case WAIT_TIMEOUT:
-        // timeout before client connected
+        std::wcout << L"Timeout before client connected." << std::endl;
         pipe = 0;
         pending_io = false;
         break;
