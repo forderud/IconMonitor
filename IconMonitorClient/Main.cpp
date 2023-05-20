@@ -147,6 +147,15 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
+    {
+        // query initial window title
+        wchar_t title[1024] = {};
+        int res = GetWindowTextW(hwnd, title, (int)std::size(title));
+        if (res) {
+            std::wcout << L"Initial window title: " << title << std::endl;
+        }
+    }
+
     // event for the connect operation
     OVERLAPPED connect = {};
     connect.hEvent = CreateEventW(NULL, true, true, NULL);
