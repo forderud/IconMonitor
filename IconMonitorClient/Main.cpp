@@ -134,15 +134,16 @@ int main(int argc, char* argv[]) {
     std::wcout << L"IconMonitorClient." << std::endl;
 
     if (argc < 2) {
-        std::wcerr << L"ERROR: Please provide a thread handle as argument.\n";
+        std::wcerr << L"ERROR: Please provide a window handle as argument.\n";
         exit(-1);
     }
 
-    DWORD thread_id = std::stoi(argv[1]);
-    std::wcout << L"Injecting hook DLL into proces with thread-id=" << thread_id << std::endl;
+    auto hwnd = (HWND)std::stoll(argv[1]);
+    DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);
+    std::wcout << L"Injecting hook DLL into proces with HWND=" << (size_t)hwnd << std::endl;
     MonitorIconUpdate monitor(thread_id);
     if (!monitor) {
-        std::wcerr << L"ERROR: Invalid thread handle argument.\n";
+        std::wcerr << L"ERROR: Invalid window handle argument.\n";
         exit(-1);
     }
 

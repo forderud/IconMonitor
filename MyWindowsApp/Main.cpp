@@ -20,11 +20,27 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     wc.lpszClassName = CLASS_NAME;
     RegisterClass(&wc);
 
-    DWORD thread_id = GetCurrentThreadId();
-    std::wstring window_title = L"My Windows app (thread " + std::to_wstring(thread_id) + L")";
+    // Create the window.
+    POINT position = {CW_USEDEFAULT, CW_USEDEFAULT};
+    POINT size = {600, 400};
+
+    HWND hwnd = CreateWindowEx(0, CLASS_NAME,
+        CLASS_NAME,
+        WS_OVERLAPPEDWINDOW,    // Window style
+        position.x, position.y, size.x, size.y,
+        NULL,       // Parent window    
+        NULL,       // Menu
+        hInstance,  // Instance handle
+        NULL        // Additional application data
+    );
+    assert(hwnd);
+
+    std::wstring window_title = L"My Windows app (HWND " + std::to_wstring((size_t)hwnd) + L")";
+    SetWindowTextW(hwnd, window_title.c_str());
+
     {
-        // copy thread ID to clipboard
-        std::string str = std::to_string(thread_id); // in decimal format
+        // copy window handle to clipboard
+        std::string str = std::to_string((size_t)hwnd); // in decimal format
         // copy string to separate buffer
         const size_t len = str.size() + 1;
         HGLOBAL buf = GlobalAlloc(GMEM_MOVEABLE, len);
@@ -37,21 +53,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         buf = nullptr;
         CloseClipboard();
     }
-
-    // Create the window.
-    POINT position = {CW_USEDEFAULT, CW_USEDEFAULT};
-    POINT size = {600, 400};
-
-    HWND hwnd = CreateWindowEx(0, CLASS_NAME,
-        window_title.c_str(),
-        WS_OVERLAPPEDWINDOW,    // Window style
-        position.x, position.y, size.x, size.y,
-        NULL,       // Parent window    
-        NULL,       // Menu
-        hInstance,  // Instance handle
-        NULL        // Additional application data
-    );
-    assert(hwnd);
 
     ShowWindow(hwnd, nCmdShow);
 
