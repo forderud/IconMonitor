@@ -5,6 +5,14 @@
 
 static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
+
+static std::wstring WindowStr(HWND window) {
+    std::wstringstream window_str;
+    window_str << (size_t)window;
+    return window_str.str();
+}
+
+
 class BaseMessage {
 public:
     BaseMessage(UINT t, HWND wnd) : type(t), window(wnd) {
@@ -12,12 +20,6 @@ public:
 
     bool IsValid() const {
         return type && window;
-    }
-
-    std::wstring WindowStr() const {
-        std::wstringstream window_str;
-        window_str << (size_t)window;
-        return window_str.str();
     }
 
     const UINT type = 0;
@@ -37,7 +39,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[IconUpdateMessage] window=" + WindowStr()
+        std::wstring result = L"[IconUpdateMessage] window=" + WindowStr(window)
             + L", param=" + std::to_wstring(param)
             + L", icon=" + std::to_wstring((size_t)icon);
 
@@ -120,7 +122,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[TitlepdateMessage] window=" + WindowStr();
+        std::wstring result = L"[TitlepdateMessage] window=" + WindowStr(window);
         result += L" title=" + std::wstring(title);
 
         return result;
