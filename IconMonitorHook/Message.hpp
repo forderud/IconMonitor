@@ -6,7 +6,7 @@
 static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
 
-static std::wstring WindowStr(HWND window) {
+static std::wstring HandleHexStr(HANDLE window) {
     std::wstringstream window_str; // in hex format
     window_str << std::hex << (size_t)window;
     return window_str.str();
@@ -39,7 +39,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[IconUpdateMessage] window=" + WindowStr(window)
+        std::wstring result = L"[IconUpdateMessage] window=" + HandleHexStr(window)
             + L", param=" + std::to_wstring(param)
             + L", icon=" + std::to_wstring((size_t)icon);
 
@@ -122,7 +122,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[TitlepdateMessage] window=" + WindowStr(window);
+        std::wstring result = L"[TitlepdateMessage] window=" + HandleHexStr(window);
         result += L" title=" + std::wstring(title);
 
         return result;
