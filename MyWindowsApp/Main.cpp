@@ -41,7 +41,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     {
         // copy window handle to clipboard
         std::string str = std::to_string((size_t)hwnd); // in decimal format
-        // copy string to separate buffer
+        // copy ASCII string to separate buffer
         const size_t len = str.size() + 1;
         HGLOBAL buf = GlobalAlloc(GMEM_MOVEABLE, len);
         memcpy(GlobalLock(buf), str.c_str(), len);

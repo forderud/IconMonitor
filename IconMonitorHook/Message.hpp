@@ -1,4 +1,5 @@
 #pragma once
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -11,6 +12,12 @@ public:
 
     bool IsValid() const {
         return type && window;
+    }
+
+    std::wstring WindowStr() const {
+        std::wstringstream window_str;
+        window_str << (size_t)window;
+        return window_str.str();
     }
 
     const UINT type = 0;
@@ -30,7 +37,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[IconUpdateMessage] window=" + std::to_wstring((size_t)window)
+        std::wstring result = L"[IconUpdateMessage] window=" + WindowStr()
             + L", param=" + std::to_wstring(param)
             + L", icon=" + std::to_wstring((size_t)icon);
 
@@ -113,7 +120,7 @@ public:
     }
 
     std::wstring ToString() const {
-        std::wstring result = L"[TitlepdateMessage] window=" + std::to_wstring((size_t)window);
+        std::wstring result = L"[TitlepdateMessage] window=" + WindowStr();
         result += L" title=" + std::wstring(title);
 
         return result;
