@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "IconHandle.hpp"
 
@@ -35,16 +36,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     );
     assert(hwnd);
 
-    std::wstring window_title = L"My Windows app (HWND " + std::to_wstring((size_t)hwnd) + L")";
-    SetWindowTextW(hwnd, window_title.c_str());
+    std::stringstream hwnd_str;
+    hwnd_str << (size_t)hwnd; // in decimal format
+
+    std::string window_title = "My Windows app (HWND " + hwnd_str.str() + ")";
+    SetWindowTextA(hwnd, window_title.c_str());
 
     {
         // copy window handle to clipboard
-        std::string str = std::to_string((size_t)hwnd); // in decimal format
         // copy ASCII string to separate buffer
-        const size_t len = str.size() + 1;
+        const size_t len = hwnd_str.str().size() + 1;
         HGLOBAL buf = GlobalAlloc(GMEM_MOVEABLE, len);
-        memcpy(GlobalLock(buf), str.c_str(), len);
+        memcpy(GlobalLock(buf), hwnd_str.str().c_str(), len);
         GlobalUnlock(buf);
         // move buffer to clipboard
         OpenClipboard(0);
