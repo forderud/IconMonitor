@@ -20,7 +20,8 @@ static HANDLE InitializePipe() {
         NULL);          // no template file 
     if (pipe == INVALID_HANDLE_VALUE) {
         DWORD err = GetLastError();
-        assert((err != ERROR_ACCESS_DENIED) && "when trying to open pipe"); // sandboxing problem
+        assert((err != ERROR_ACCESS_DENIED) && "access denied when trying to open pipe"); // sandboxing problem
+        assert((err != ERROR_FILE_NOT_FOUND) && "pipe not found");
         assert(false);
         abort();
     }
