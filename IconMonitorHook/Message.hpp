@@ -7,8 +7,8 @@ static constexpr wchar_t PIPE_NAME_BASE[] = L"\\\\.\\pipe\\IconMonitor_";
 
 
 static std::wstring WindowStr(HWND window) {
-    std::wstringstream window_str;
-    window_str << (size_t)window;
+    std::wstringstream window_str; // in hex format
+    window_str << std::hex << (size_t)window;
     return window_str.str();
 }
 

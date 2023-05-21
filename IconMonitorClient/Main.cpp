@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
 
-    auto hwnd = (HWND)std::stoll(argv[1]);
+    auto hwnd = (HWND)std::stoll(argv[1], nullptr, 16);
     DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);
     std::wcout << L"Injecting hook DLL into process with HWND=" << WindowStr(hwnd) << std::endl;
     MonitorIconUpdate monitor(thread_id);

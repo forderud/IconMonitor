@@ -36,8 +36,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     );
     assert(hwnd);
 
-    std::stringstream hwnd_str;
-    hwnd_str << (size_t)hwnd; // in decimal format
+    std::stringstream hwnd_str; // in ASCII hex format
+    hwnd_str << std::hex << (size_t)hwnd;
 
     std::string window_title = "My Windows app (HWND " + hwnd_str.str() + ")";
     SetWindowTextA(hwnd, window_title.c_str());
