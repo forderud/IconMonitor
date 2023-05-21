@@ -164,8 +164,7 @@ int main(int argc, char* argv[]) {
     std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
     // wait for client to connect
-    DWORD FIRST_MESSAGE_TIMEOUT = 10000; // [ms]
-    DWORD res = WaitForSingleObjectEx(connect.hEvent, FIRST_MESSAGE_TIMEOUT, true); // alertable wait
+    DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
     // The wait conditions are satisfied by a completed connect operation. 
     switch (res) {
