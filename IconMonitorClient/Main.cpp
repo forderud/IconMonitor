@@ -67,7 +67,7 @@ std::tuple<BOOL,HANDLE> CreateAndConnectInstance(OVERLAPPED& overlap, DWORD thre
         PIPE_UNLIMITED_INSTANCES,   // unlimited instances 
         0,                          // output buffer size (empty)
         4*sizeof(IconUpdateMessage),// input buffer size (allow 4 unprocessed icon updates before the process freezes)
-        1000,                       // client timeout [ms]
+        1000,                       // client connect timeout [ms]
         &sa);                       // security
     assert(pipe != INVALID_HANDLE_VALUE);
 
@@ -164,8 +164,8 @@ int main(int argc, char* argv[]) {
     std::tie(pending_io, pipe) = CreateAndConnectInstance(connect, thread_id);
 
     // wait for client to connect
-    DWORD CLIENT_CONNECT_TIMEOUT = 1000; // [ms]
-    DWORD res = WaitForSingleObjectEx(connect.hEvent, CLIENT_CONNECT_TIMEOUT, true); // alertable wait
+    DWORD FIRST_MESSAGE_TIMEOUT = 10000; // [ms]
+    DWORD res = WaitForSingleObjectEx(connect.hEvent, FIRST_MESSAGE_TIMEOUT, true); // alertable wait
 
     // The wait conditions are satisfied by a completed connect operation. 
     switch (res) {
