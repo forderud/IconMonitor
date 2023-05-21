@@ -131,8 +131,6 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
 }
 
 int main(int argc, char* argv[]) {
-    std::wcout << L"IconMonitorClient." << std::endl;
-
     if (argc < 2) {
         std::wcerr << L"ERROR: Please provide a window handle as argument.\n";
         exit(-1);
@@ -140,21 +138,20 @@ int main(int argc, char* argv[]) {
 
     auto hwnd = (HWND)std::stoll(argv[1], nullptr, 16); // hex value
 
+    {
+        // query initial window title
+        wchar_t title[1024] = {};
+        int res = GetWindowTextW(hwnd, title, (int)std::size(title));
+        assert(res);
+        std::wcout << L"Initial window title: " << title << std::endl;
+    }
+
     DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);
     std::wcout << L"Injecting hook DLL into process with HWND=" << WindowStr(hwnd) << std::endl;
     MonitorIconUpdate monitor(thread_id);
     if (!monitor) {
         std::wcerr << L"ERROR: Invalid window handle argument.\n";
         exit(-1);
-    }
-
-    {
-        // query initial window title
-        wchar_t title[1024] = {};
-        int res = GetWindowTextW(hwnd, title, (int)std::size(title));
-        if (res) {
-            std::wcout << L"Initial window title: " << title << std::endl;
-        }
     }
 
     // event for the connect operation
