@@ -41,7 +41,7 @@ public:
     std::wstring ToString() const {
         std::wstring result = L"[IconUpdateMessage] window=" + HandleHexStr(window)
             + L", param=" + std::to_wstring(param)
-            + L", icon=" + std::to_wstring((size_t)icon);
+            + L", icon=" + HandleHexStr(icon);
 
         auto size = IconSize(icon);
         result += L" size={" + std::to_wstring(size.x) + L"," + std::to_wstring(size.y) + L"}";
