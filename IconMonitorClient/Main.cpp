@@ -144,6 +144,10 @@ int main(int argc, char* argv[]) {
         int res = GetWindowTextW(hwnd, title, (int)std::size(title));
         assert(res);
         std::wcout << L"Initial window title: " << title << std::endl;
+
+        // query initial icon
+        auto icon = (HICON)SendMessageW(hwnd, WM_GETICON, ICON_SMALL, 0);
+        std::wcout << L"Initial icon: " << HandleHexStr(icon) << std::endl;
     }
 
     DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);
