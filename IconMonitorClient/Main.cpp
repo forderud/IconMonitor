@@ -145,8 +145,8 @@ int main(int argc, char* argv[]) {
         assert(res);
         std::wcout << L"Initial window title: " << title << std::endl;
 
-        // query initial icon
-        auto icon = (HICON)SendMessageW(hwnd, WM_GETICON, ICON_SMALL, 0);
+        // query initial windws taskbar icon (ICON_BIG)
+        auto icon = (HICON)SendMessageW(hwnd, WM_GETICON, ICON_BIG, 0);
         std::wcout << L"Initial icon: " << HandleHexStr(icon) << std::endl;
     }
 
