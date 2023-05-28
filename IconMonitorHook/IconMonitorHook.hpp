@@ -4,9 +4,9 @@
 #include "Message.hpp"
 
 /** Client-side hook function setup. */
-class MonitorIconHook {
+class InconMonitorHook {
 public:
-    MonitorIconHook(DWORD thread_id) {
+    InconMonitorHook(DWORD thread_id) {
         m_module = LoadLibraryW(L"IconMonitorHook.dll"); // DLL handle
         assert(m_module);
         auto callback = (HOOKPROC)GetProcAddress(m_module, "Hookproc");
@@ -14,7 +14,7 @@ public:
         // might fail on invalid thread_id
         m_hook = SetWindowsHookExW(WH_CALLWNDPROCRET, callback, m_module, thread_id);
     }
-    ~MonitorIconHook() {
+    ~InconMonitorHook() {
         if (m_hook) {
             UnhookWindowsHookEx(m_hook);
             m_hook = 0;
