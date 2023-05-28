@@ -39,6 +39,11 @@ struct PIPEINST : public OVERLAPPED {
     // read message
     AnyMessage request;
 
+    static int ObjCount() {
+        return s_count;
+    }
+
+private:
     static int s_count; // instance count
 };
 int PIPEINST::s_count = 0;
@@ -200,7 +205,7 @@ int main(int argc, char* argv[]) {
     }
 
     // process completion routines until all clients are disconnected
-    while (PIPEINST::s_count > 0) {
+    while (PIPEINST::ObjCount() > 0) {
         SleepEx(1000, true); // returns immediately on alert 
     }
 
