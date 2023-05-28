@@ -24,10 +24,13 @@ struct PIPEINST : public OVERLAPPED, public std::enable_shared_from_this<PIPEINS
         hEvent = 0;
     }
 
-    void Initialize() {
+    /** Increase ref-count by one. 
+      * Must be done _after_ the constructor. */
+    void AddRef() {
         m_self_ref = shared_from_this();
     }
 
+    /** Decrease ref-count by one. */
     void Release() {
         m_self_ref.reset();
     }
@@ -191,7 +194,7 @@ int main(int argc, char* argv[]) {
 
         // Start the read operation for this client (move pipe to new PIPEINST object)
         auto pipe_obj = std::make_shared<PIPEINST>(pipe);
-        pipe_obj->Initialize();
+        pipe_obj->AddRef();
         pipe_inst = pipe_obj;
         CompletedReadRoutine(0, sizeof(PIPEINST::request), pipe_obj.get());
         pipe = 0;
