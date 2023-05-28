@@ -135,9 +135,9 @@ private:
 static_assert(sizeof(TitlepdateMessage) == sizeof(BaseMessage) + sizeof(TitlepdateMessage::title));
 
 
-class MonitorIconUpdate {
+class MonitorIconHook {
 public:
-    MonitorIconUpdate(DWORD thread_id) {
+    MonitorIconHook(DWORD thread_id) {
         m_module = LoadLibraryW(L"IconMonitorHook.dll"); // DLL handle
         assert(m_module);
         auto callback = (HOOKPROC)GetProcAddress(m_module, "Hookproc");
@@ -145,7 +145,7 @@ public:
         // might fail on invalid thread_id
         m_hook = SetWindowsHookExW(WH_CALLWNDPROCRET, callback, m_module, thread_id);
     }
-    ~MonitorIconUpdate() {
+    ~MonitorIconHook() {
         if (m_hook) {
             UnhookWindowsHookEx(m_hook);
             m_hook = 0;

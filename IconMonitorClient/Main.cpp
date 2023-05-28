@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
 
     DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);
     std::wcout << L"Injecting hook DLL into process with HWND=" << HandleHexStr(hwnd) << std::endl;
-    MonitorIconUpdate monitor(thread_id);
+    MonitorIconHook monitor(thread_id);
     if (!monitor) {
         std::wcerr << L"ERROR: Invalid window handle argument.\n";
         exit(-1);
