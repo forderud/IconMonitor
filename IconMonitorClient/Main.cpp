@@ -14,15 +14,22 @@ union AnyMessage {
     TitlepdateMessage title;
 };
 
-struct PIPEINST : public OVERLAPPED {
+struct PIPEINST : public OVERLAPPED, public std::enable_shared_from_this<PIPEINST> {
     PIPEINST(HANDLE _pipe) : pipe(_pipe) {
         assert(_pipe);
-        s_count++;
         // clear inherited fields
         Internal = 0;
         InternalHigh = 0;
         Pointer = 0;
         hEvent = 0;
+    }
+
+    void Initialize() {
+        m_self_ref = shared_from_this();
+    }
+
+    void Release() {
+        m_self_ref.reset();
     }
 
     ~PIPEINST() {
@@ -31,7 +38,6 @@ struct PIPEINST : public OVERLAPPED {
         CloseHandle(pipe);
 
         std::wcout << L"Pipe disconnected." << std::endl;
-        s_count--;
     }
 
     HANDLE pipe = 0;
@@ -39,14 +45,10 @@ struct PIPEINST : public OVERLAPPED {
     // read message
     AnyMessage request;
 
-    static int ObjCount() {
-        return s_count;
-    }
-
 private:
-    static int s_count; // instance count
+    std::shared_ptr<PIPEINST> m_self_ref;
 };
-int PIPEINST::s_count = 0;
+
 
 /** Creates a pipe instance and connects to the client.
     Returns TRUE if the connect operation is pending, and FALSE if the connection has been completed. */
@@ -112,13 +114,13 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     if (err != 0) {
         // previous read failed so clean up and return
         std::wcerr << L"NOTICE: Read failed. Probably due to disconnect.\n";
-        delete pipeInst;
+        pipeInst->Release();
         return;
     }
     if ((bRead != sizeof(pipeInst->request.icon)) && (bRead != sizeof(pipeInst->request.title))) {
         // previous read truncated so clean up and return
         std::wcerr << L"NOTICE: Read truncated.\n";
-        delete pipeInst;
+        pipeInst->Release();
         return;
     }
 
@@ -132,7 +134,7 @@ void CompletedReadRoutine(DWORD err, DWORD bRead, OVERLAPPED* overLap) {
     BOOL ok = ReadFileEx(pipeInst->pipe, &pipeInst->request, sizeof(pipeInst->request),
         pipeInst, (LPOVERLAPPED_COMPLETION_ROUTINE)CompletedReadRoutine);
     if (!ok)
-        delete pipeInst;
+        pipeInst->Release();
 }
 
 int main(int argc, char* argv[]) {
@@ -171,6 +173,8 @@ int main(int argc, char* argv[]) {
     // wait for client to connect
     DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
+    std::shared_ptr<PIPEINST> pipe_inst;
+
     // The wait conditions are satisfied by a completed connect operation. 
     switch (res) {
     case WAIT_OBJECT_0:
@@ -186,7 +190,9 @@ int main(int argc, char* argv[]) {
         }
 
         // Start the read operation for this client (move pipe to new PIPEINST object)
-        CompletedReadRoutine(0, sizeof(PIPEINST::request), new PIPEINST(pipe));
+        pipe_inst = std::make_shared<PIPEINST>(pipe);
+        pipe_inst->Initialize();
+        CompletedReadRoutine(0, sizeof(PIPEINST::request), pipe_inst.get());
         pipe = 0;
         pending_io = false;
         break;
@@ -205,7 +211,7 @@ int main(int argc, char* argv[]) {
     }
 
     // process completion routines until all clients are disconnected
-    while (PIPEINST::ObjCount() > 0) {
+    while (pipe_inst.use_count() > 1) {
         SleepEx(1000, true); // returns immediately on alert 
     }
 
