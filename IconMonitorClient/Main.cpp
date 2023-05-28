@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
     // wait for client to connect
     DWORD res = WaitForSingleObjectEx(connect.hEvent, INFINITE, true); // alertable wait
 
-    std::shared_ptr<PIPEINST> pipe_inst;
+    std::weak_ptr<PIPEINST> pipe_inst;
 
     // The wait conditions are satisfied by a completed connect operation. 
     switch (res) {
@@ -190,9 +190,10 @@ int main(int argc, char* argv[]) {
         }
 
         // Start the read operation for this client (move pipe to new PIPEINST object)
-        pipe_inst = std::make_shared<PIPEINST>(pipe);
-        pipe_inst->Initialize();
-        CompletedReadRoutine(0, sizeof(PIPEINST::request), pipe_inst.get());
+        auto pipe_obj = std::make_shared<PIPEINST>(pipe);
+        pipe_obj->Initialize();
+        pipe_inst = pipe_obj;
+        CompletedReadRoutine(0, sizeof(PIPEINST::request), pipe_obj.get());
         pipe = 0;
         pending_io = false;
         break;
@@ -211,7 +212,7 @@ int main(int argc, char* argv[]) {
     }
 
     // process completion routines until all clients are disconnected
-    while (pipe_inst.use_count() > 1) {
+    while (pipe_inst.use_count() > 0) {
         SleepEx(1000, true); // returns immediately on alert 
     }
 
