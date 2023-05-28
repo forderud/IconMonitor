@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <sddl.h> // for SDDL_REVISION_1
 
-#include "../IconMonitorHook/Message.hpp"
+#include "../IconMonitorHook/IconMonitorHook.hpp"
 
 
 union AnyMessage {
