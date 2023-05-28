@@ -139,15 +139,11 @@ int main(int argc, char* argv[]) {
     auto hwnd = (HWND)std::stoll(argv[1], nullptr, 16); // hex value
 
     {
+        IconQuery win_query(hwnd);
         // query initial window title
-        wchar_t title[1024] = {};
-        int res = GetWindowTextW(hwnd, title, (int)std::size(title));
-        assert(res);
-        std::wcout << L"Initial window title: " << title << std::endl;
-
-        // query initial windws taskbar icon (ICON_BIG)
-        auto icon = (HICON)SendMessageW(hwnd, WM_GETICON, ICON_BIG, 0);
-        std::wcout << L"Initial icon: " << HandleHexStr(icon) << std::endl;
+        std::wcout << L"Initial window title: " << win_query.GetText() << std::endl;
+        // query initial icon
+        std::wcout << L"Initial icon: " << HandleHexStr(win_query.GetIcon()) << std::endl;
     }
 
     DWORD thread_id = GetWindowThreadProcessId(hwnd, nullptr);

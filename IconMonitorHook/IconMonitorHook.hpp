@@ -32,3 +32,27 @@ private:
     HINSTANCE m_module = 0;
     HHOOK     m_hook = 0;
 };
+
+
+class IconQuery {
+public:
+    IconQuery(HWND wnd) : m_wnd(wnd) {
+    }
+
+    std::wstring GetText() const {
+        // query titlebar text
+        wchar_t text[1024] = {};
+        int res = GetWindowTextW(m_wnd, text, (int)std::size(text));
+        assert(res);
+        return text;
+    }
+
+    HICON GetIcon() const {
+        // query windws taskbar icon (ICON_BIG)
+        auto icon = (HICON)SendMessageW(m_wnd, WM_GETICON, ICON_BIG, 0);
+        return icon;
+    }
+
+private:
+    HWND m_wnd = 0;
+};
