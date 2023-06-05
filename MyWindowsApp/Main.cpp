@@ -100,6 +100,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             SetWindowTextW(hwnd, m_titlebar.Title());
         }
         break;
+    case WM_POWERBROADCAST:
+        {
+            if (wParam == PBT_APMSUSPEND) {
+                assert(!lParam);
+                SetWindowTextW(hwnd, L"System is suspending");
+            } else if (wParam == PBT_APMRESUMESUSPEND) {
+                assert(!lParam);
+                SetWindowTextW(hwnd, L"Resuming from low-power state");
+            } else if (wParam == PBT_APMRESUMEAUTOMATIC) {
+                assert(!lParam);
+                SetWindowTextW(hwnd, L"Resuming automatically from low-power state");
+            }
+        }
+        break;
     }
     return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 }
